@@ -343,16 +343,16 @@
                     <p class="text-xs text-slate-400 mt-1">다양한 혜택을 수령하고 잔액을 즉시 충전하세요!</p>
                 </div>
 
-                <!-- 이벤트 1: 신규가입 무료 룰렛 -->
+                <!-- 이벤트 1: 신규가입 무료 룰렛 (임시 차단 중) -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-amber-500/30 flex flex-col gap-3">
                     <div class="flex justify-between items-center">
                         <span class="bg-amber-500/20 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-500/30">이벤트 1</span>
-                        <span id="rouletteStatusBadge" class="text-[11px] text-emerald-400 font-bold">참여 가능 (1회 한정)</span>
+                        <span id="rouletteStatusBadge" class="text-[11px] text-amber-400 font-bold">오픈 준비 중</span>
                     </div>
                     <h3 class="text-sm font-bold text-white">🎰 신규 가입 무료 룰렛 1회 수령</h3>
                     <p class="text-xs text-slate-400">신규 회원 전원에게 무료 룰렛 1회 기회를 제공합니다! (최대 100만 ₩ 획득)</p>
-                    <button onclick="spinRouletteEvent()" id="btnSpinRoulette" class="gold-gradient-btn w-full py-2.5 rounded-xl text-xs font-bold shadow">
-                        🎁 무료 룰렛 돌리고 보너스 받기
+                    <button onclick="spinRouletteEvent()" id="btnSpinRoulette" class="bg-slate-800 text-slate-400 hover:bg-slate-700 w-full py-2.5 rounded-xl text-xs font-bold border border-slate-700">
+                        🎁 무료 룰렛 돌리고 보너스 받기 (임시 중단)
                     </button>
                 </div>
 
@@ -570,7 +570,7 @@
         }
 
         // 최초 기본 잔액: 300,000₩
-        let balance = 500000;
+        let balance = 300000;
         let selectedChipVal = 10000;
         let currentBets = { player: 0, banker: 0, tie: 0, playerPair: 0, bankerPair: 0 };
         let betHistoryStack = [];
@@ -796,17 +796,6 @@
             document.getElementById('evtStreakCrash').innerText = streaks.crash;
             document.getElementById('evtStreakLadder').innerText = streaks.ladder;
 
-            // 룰렛 이벤트 상태
-            const btnR = document.getElementById('btnSpinRoulette');
-            const badgeR = document.getElementById('rouletteStatusBadge');
-            if (isRouletteUsed) {
-                btnR.disabled = true;
-                btnR.className = "bg-slate-800 text-slate-500 w-full py-2.5 rounded-xl text-xs font-bold cursor-not-allowed";
-                btnR.innerText = "수령 완료 (1회 한정)";
-                badgeR.innerText = "수령 완료";
-                badgeR.className = "text-[11px] text-slate-500 font-bold";
-            }
-
             // 연승 보너스 버튼 상태 업데이트
             updateStreakBtn('baccarat', 'btnClaimBacc');
             updateStreakBtn('crash', 'btnClaimCrash');
@@ -829,20 +818,25 @@
             }
         }
 
+        // 신규가입 룰렛 이벤트 (임시 차단 처리)
         function spinRouletteEvent() {
             showToast("알림", "회원가입 기능 오픈 준비 중입니다. 신규 가입 룰렛 이벤트는 임시 중단되었습니다.");
-            //if (isRouletteUsed) return showToast("이미 룰렛 보너스를 수령하셨습니다.");
+            return;
             
-            //let rewards = [100000, 200000, 300000, 500000, 1000000];
-            //let won = rewards[Math.floor(Math.random() * rewards.length)];
+            /* 추후 기능 오픈 시 주석 해제하여 사용
+            if (isRouletteUsed) return showToast("이미 룰렛 보너스를 수령하셨습니다.");
+            
+            let rewards = [100000, 200000, 300000, 500000, 1000000];
+            let won = rewards[Math.floor(Math.random() * rewards.length)];
 
-            //isRouletteUsed = true;
-            //balance += won;
-            //updateBalanceDisplay();
-            //updateEventUI();
-            //playSound('win');
+            isRouletteUsed = true;
+            balance += won;
+            updateBalanceDisplay();
+            updateEventUI();
+            playSound('win');
 
-            //showToast("🎉 축하합니다!", `신규가입 룰렛 당첨!\n무료 보너스 +${won.toLocaleString()} ₩ 이 잔액에 즉시 지급되었습니다.`);
+            showToast("🎉 축하합니다!", `신규가입 룰렛 당첨!\n무료 보너스 +${won.toLocaleString()} ₩ 이 잔액에 즉시 지급되었습니다.`);
+            */
         }
 
         function claimStreakBonus(gameKey) {
@@ -948,4 +942,593 @@
             const ball = document.getElementById('ladderBall');
             ball.classList.remove('hidden');
 
-            // 결과 무작위 생성 (좌/우, 3줄/4줄)
+            // 결과 무작위 생성 (3줄 / 4줄)
+            const isStartLeft = Math.random() < 0.5;
+            const lineCount = Math.random() < 0.5 ? 3 : 4;
+
+            let isEndLeft = isStartLeft;
+            if (lineCount === 3) isEndLeft = !isStartLeft; // 3줄이면 반대쪽
+            const isOdd = isEndLeft; // 좌=홀, 우=짝
+
+            let finalKey = (isStartLeft ? 'LEFT' : 'RIGHT') + '_' + (isOdd ? 'ODD' : 'EVEN');
+            let finalLabel = (isStartLeft ? '좌' : '우') + '/' + (isOdd ? '홀' : '짝');
+
+            // 애니메이션 연출
+            ball.style.top = '4px';
+            ball.style.left = isStartLeft ? '6px' : '165px';
+            await sleep(400); playSound('tick');
+
+            document.getElementById('ladderLine1').classList.remove('hidden');
+            ball.style.top = '30px';
+            await sleep(400); playSound('tick');
+
+            document.getElementById('ladderLine2').classList.remove('hidden');
+            ball.style.top = '75px';
+            ball.style.left = isEndLeft ? '6px' : '165px';
+            await sleep(400); playSound('tick');
+
+            ball.style.top = '115px';
+            await sleep(400);
+
+            document.getElementById('ladderResultText').innerText = `🎉 ${finalLabel}`;
+            
+            // 배팅 정산
+            if (ladderIsParticipating && ladderSelectedSpot) {
+                const amt = parseInt(document.getElementById('ladderBetAmountInput').value || 0, 10);
+                if (ladderSelectedSpot === finalKey) {
+                    let winAmt = Math.floor(amt * 1.95);
+                    balance += winAmt;
+                    updateBalanceDisplay();
+                    streaks.ladder++;
+                    playSound('win');
+                    showToast("🎉 사다리 적중!", `+${winAmt.toLocaleString()} ₩ 획득 완료! (연승: ${streaks.ladder}회)`);
+                } else {
+                    streaks.ladder = 0;
+                    showToast("💥 아쉬움", "사다리 예측 실패!");
+                }
+            }
+
+            ladderHistory.push(finalLabel);
+            document.getElementById('ladderHistoryList').innerText = ladderHistory.slice(-5).join(', ');
+
+            setTimeout(() => {
+                startLadderGameLoop();
+            }, 3000);
+        }
+
+        // ==================== 환전 시스템 로직 ====================
+        function addExchangeAmount(amt) {
+            const input = document.getElementById('exchangeAmountInput');
+            let current = parseInt(input.value || 0, 10);
+            let next = current + amt;
+            if (next > 1000000) next = 1000000;
+            input.value = next;
+            playSound('chip');
+        }
+
+        function clearExchangeInput() {
+            document.getElementById('exchangeAmountInput').value = '';
+            playSound('chip');
+        }
+
+        function submitExchangeRequest() {
+            const input = document.getElementById('exchangeAmountInput');
+            const amt = parseInt(input.value || 0, 10);
+
+            if (!amt || amt <= 0) return showToast("알림", "환전할 금액을 입력해주세요.");
+            if (amt < 10000) return showToast("알림", "최소 환전 신청 금액은 10,000 ₩ 입니다.");
+            if (amt > 1000000) return showToast("알림", "1회 최대 환전 가능 금액은 1,000,000 ₩ 입니다.");
+            if (amt % 10000 !== 0) return showToast("알림", "환전 금액은 1만 원 단위로만 신청 가능합니다.");
+            if (balance < amt) return showToast("알림", "보유 잔액이 부족합니다.");
+
+            showToast("알림", "충전이력이 있는 회원님만 환전이 가능합니다.");
+        }
+
+        function renderExchangeHistory() {
+            const tbody = document.getElementById('exchangeHistoryBody');
+            tbody.innerHTML = '';
+            if (exchangeHistory.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-500">환전 신청 이력이 없습니다.</td></tr>`;
+                return;
+            }
+            exchangeHistory.slice(0, 20).forEach(h => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2.5 font-mono text-[11px] text-slate-400">${h.date}</td>
+                    <td class="p-2.5 font-bold text-amber-400 font-mono">${h.amount.toLocaleString()} ₩</td>
+                    <td class="p-2.5 text-right font-bold text-red-400">${h.status}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ==================== 그래프 게임 루프 ====================
+        function setCrashBet(amount) {
+            if (crashGamePhase === 'RUNNING') return showToast("게임 상승 중에는 배팅금을 바꿀 수 없습니다.");
+            if (balance < amount) return showToast("잔액이 부족합니다.");
+            crashBetAmount = amount;
+            document.getElementById('crashBetAmountDisplay').innerText = crashBetAmount.toLocaleString() + ' ₩';
+        }
+
+        function updateCrashHistoryUI() {
+            const listStr = crashHistory.slice(-5).map(v => v.toFixed(2) + 'x').join(', ');
+            document.getElementById('crashHistoryList').innerText = listStr;
+        }
+
+        function generateCrashPoint() {
+            let e = 0.98;
+            let r = Math.random();
+            if (r < 0.02) return 1.00;
+            let crash = Math.floor((100 / (1.0 - r * e))) / 100.0;
+            return Math.max(1.01, crash);
+        }
+
+        function startCrashGameLoop() {
+            if (waitTimerInterval) clearInterval(waitTimerInterval);
+            if (crashLoopInterval) clearInterval(crashLoopInterval);
+            runWaitingPhase();
+        }
+
+        function runWaitingPhase() {
+            crashGamePhase = 'WAITING';
+            crashTimer = 5;
+            isParticipating = false;
+            hasCashedOut = false;
+            currentMultiplier = 1.00;
+            targetCrashPoint = generateCrashPoint();
+
+            document.getElementById('crashMultiplierDisplay').innerText = "1.00x";
+            
+            const btn = document.getElementById('crashActionButton');
+            btn.innerText = "다음 라운드 참여 예약 (클릭 시 참여)";
+            btn.className = "w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl text-sm shadow-lg transition";
+
+            waitTimerInterval = setInterval(() => {
+                document.getElementById('crashStatusText').innerText = `⏳ 다음 라운드 시작까지 ${crashTimer}초 남았습니다... (참여 가능)`;
+                crashTimer--;
+                if (crashTimer < 0) {
+                    clearInterval(waitTimerInterval);
+                    runRunningPhase();
+                }
+            }, 1000);
+        }
+
+        function toggleCrashParticipation() {
+            if (crashGamePhase !== 'WAITING') return;
+
+            if (!isParticipating) {
+                if (balance < crashBetAmount) return showToast("잔액이 부족합니다.");
+                balance -= crashBetAmount;
+                updateBalanceDisplay();
+                isParticipating = true;
+
+                const btn = document.getElementById('crashActionButton');
+                btn.innerText = "참여 완료! (라운드 시작 대기 중)";
+                btn.className = "w-full bg-blue-600 text-white font-bold py-3 rounded-xl text-sm shadow-lg";
+                showToast("그래프 게임 참여가 완료되었습니다!");
+                playSound('chip');
+            } else {
+                balance += crashBetAmount;
+                updateBalanceDisplay();
+                isParticipating = false;
+
+                const btn = document.getElementById('crashActionButton');
+                btn.innerText = "다음 라운드 참여 예약 (클릭 시 참여)";
+                btn.className = "w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl text-sm shadow-lg transition";
+                showToast("참여가 취소되었습니다.");
+            }
+        }
+
+        function runRunningPhase() {
+            crashGamePhase = 'RUNNING';
+            currentMultiplier = 1.00;
+
+            const btn = document.getElementById('crashActionButton');
+            if (isParticipating) {
+                btn.innerText = "캐시 아웃 (CASH OUT)";
+                btn.className = "w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3 rounded-xl text-sm shadow-lg transition animate-pulse";
+                document.getElementById('crashStatusText').innerText = "🚀 그래프가 상승 중입니다! 원하는 타이밍에 캐시 아웃하세요!";
+            } else {
+                btn.innerText = "이번 라운드 미참여";
+                btn.className = "w-full bg-slate-800 text-slate-500 font-bold py-3 rounded-xl text-sm cursor-not-allowed";
+                document.getElementById('crashStatusText').innerText = "🚀 그래프가 상승 중입니다! (미참여 관전 모드)";
+            }
+
+            let startTime = Date.now();
+            crashLoopInterval = setInterval(() => {
+                let elapsed = (Date.now() - startTime) / 1000;
+                currentMultiplier = 1.00 + (elapsed * 0.2) + (Math.pow(elapsed, 1.5) * 0.08);
+                currentMultiplier = Math.floor(currentMultiplier * 100) / 100;
+
+                document.getElementById('crashMultiplierDisplay').innerText = currentMultiplier.toFixed(2) + 'x';
+                playSound('tick');
+
+                if (currentMultiplier >= targetCrashPoint) {
+                    clearInterval(crashLoopInterval);
+                    runCrashedPhase();
+                }
+            }, 70);
+        }
+
+        function handleCrashAction() {
+            if (crashGamePhase === 'WAITING') {
+                toggleCrashParticipation();
+            } else if (crashGamePhase === 'RUNNING' && isParticipating && !hasCashedOut) {
+                hasCashedOut = true;
+                let winAmt = Math.floor(crashBetAmount * currentMultiplier);
+                balance += winAmt;
+                updateBalanceDisplay();
+
+                if (currentMultiplier >= 2.0) {
+                    streaks.crash++;
+                }
+
+                playSound('cashout');
+
+                const btn = document.getElementById('crashActionButton');
+                btn.innerText = `성공! +${winAmt.toLocaleString()}₩ 획득 완료`;
+                btn.className = "w-full bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm shadow-lg";
+                document.getElementById('crashStatusText').innerText = `🎉 성공적으로 캐시 아웃하셨습니다! (그래프 관전 중...)`;
+            }
+        }
+
+        function runCrashedPhase() {
+            crashGamePhase = 'CRASHED';
+            playSound('crash');
+
+            document.getElementById('crashMultiplierDisplay').innerText = targetCrashPoint.toFixed(2) + 'x (CRASHED)';
+            
+            if (isParticipating && !hasCashedOut) {
+                streaks.crash = 0;
+                document.getElementById('crashStatusText').innerText = `💥 비행기가 추락하여 배팅금을 잃었습니다!`;
+                const btn = document.getElementById('crashActionButton');
+                btn.innerText = "추락함 (BUST)";
+                btn.className = "w-full bg-red-600 text-white font-bold py-3 rounded-xl text-sm shadow-lg";
+            }
+
+            crashHistory.push(targetCrashPoint);
+            updateCrashHistoryUI();
+
+            setTimeout(() => {
+                startCrashGameLoop();
+            }, 3000);
+        }
+
+        // ==================== 바카라 엔진 로직 ====================
+        function createDeck() {
+            const suits = ['♠', '♥', '♦', '♣'];
+            const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+            let deck = [];
+            for (let s of suits) {
+                for (let r of ranks) {
+                    let val = parseInt(r);
+                    if (r === 'A') val = 1;
+                    else if (['J', 'Q', 'K', '10'].includes(r)) val = 0;
+                    deck.push({ suit: s, rank: r, value: val });
+                }
+            }
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+            return deck;
+        }
+
+        function getCardHtml(card, index = 0) {
+            const isRed = card.suit === '♥' || card.suit === '♦';
+            const colorClass = isRed ? 'text-red-600' : 'text-slate-900';
+            return `
+                <div class="card-container dealt" id="card-${index}">
+                    <div class="card-inner" id="inner-${index}">
+                        <div class="card-face card-back">
+                            <i data-lucide="crown" class="w-4 h-4 text-amber-400 opacity-60"></i>
+                        </div>
+                        <div class="card-face card-front ${colorClass}">
+                            <div class="text-left font-bold text-[9px] leading-none">${card.rank}<br>${card.suit}</div>
+                            <div class="text-center text-lg font-serif">${card.suit}</div>
+                            <div class="text-right font-bold text-[9px] leading-none rotate-180">${card.rank}<br>${card.suit}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function autoFlipCard(index) {
+            const inner = document.getElementById(`inner-${index}`);
+            if (inner && !inner.classList.contains('flipped')) {
+                inner.classList.add('flipped');
+                playSound('card');
+            }
+        }
+
+        function calculateHandValue(cards) {
+            let sum = cards.reduce((acc, c) => acc + c.value, 0);
+            return sum % 10;
+        }
+
+        function simulateSingleRound() {
+            let deck = createDeck();
+            let pCards = [deck.pop(), deck.pop()];
+            let bCards = [deck.pop(), deck.pop()];
+            let pVal = calculateHandValue(pCards);
+            let bVal = calculateHandValue(bCards);
+
+            let natural = (pVal >= 8 || bVal >= 8);
+            let pThird = null;
+
+            if (!natural) {
+                if (pVal <= 5) {
+                    pThird = deck.pop();
+                    pCards.push(pThird);
+                    pVal = calculateHandValue(pCards);
+                }
+                let bDraw = false;
+                if (!pThird) {
+                    if (bVal <= 5) bDraw = true;
+                } else {
+                    let pv3 = pThird.value;
+                    if (bVal <= 2) bDraw = true;
+                    else if (bVal === 3 && pv3 !== 8) bDraw = true;
+                    else if (bVal === 4 && [2,3,4,5,6,7].includes(pv3)) bDraw = true;
+                    else if (bVal === 5 && [4,5,6,7].includes(pv3)) bDraw = true;
+                    else if (bVal === 6 && [6,7].includes(pv3)) bDraw = true;
+                }
+                if (bDraw) {
+                    let bThird = deck.pop();
+                    bCards.push(bThird);
+                    bVal = calculateHandValue(bCards);
+                }
+            }
+
+            let winner = 'tie';
+            if (pVal > bVal) winner = 'player';
+            else if (bVal > pVal) winner = 'banker';
+
+            let pPair = pCards[0].rank === pCards[1].rank;
+            let bPair = bCards[0].rank === bCards[1].rank;
+
+            return { winner, pPair, bPair, pVal, bVal };
+        }
+
+        async function runSimulation(count) {
+            if (isDealing) return;
+            isDealing = true;
+            document.getElementById('dealBtn').disabled = true;
+            document.getElementById('simBtn').disabled = true;
+            document.getElementById('clearBtn').disabled = true;
+            document.getElementById('undoBtn').disabled = true;
+
+            document.getElementById('gameStatusText').innerText = `⚡ ${count}회 연속 패턴 시뮬레이션 중...`;
+
+            for (let i = 0; i < count; i++) {
+                let res = simulateSingleRound();
+                stats[res.winner]++;
+                if (res.pPair) stats.pPair++;
+                if (res.bPair) stats.bPair++;
+
+                roadmapData.push(res);
+                roundCount++;
+
+                roundHistory.unshift({
+                    round: roundCount - 1,
+                    winner: res.winner.toUpperCase(),
+                    profit: 0,
+                    balance: balance
+                });
+
+                if (i % 10 === 0 || i === count - 1) {
+                    updateStatsDisplay();
+                    renderBigRoad();
+                    await sleep(20);
+                }
+            }
+
+            updateStatsDisplay();
+            document.getElementById('roundNumber').innerText = `#${roundCount}`;
+            updateHistoryTable();
+            saveSessionData();
+
+            document.getElementById('gameStatusText').innerText = `⚡ ${count}회 시뮬레이션 완료!`;
+            isDealing = false;
+            document.getElementById('dealBtn').disabled = false;
+            document.getElementById('simBtn').disabled = false;
+            document.getElementById('clearBtn').disabled = false;
+            document.getElementById('undoBtn').disabled = false;
+            playSound('win');
+        }
+
+        async function startDeal() {
+            let totalBet = Object.values(currentBets).reduce((a, b) => a + b, 0);
+            if (totalBet === 0) return showToast("배팅을 완료해주세요.");
+
+            isDealing = true;
+            document.getElementById('dealBtn').disabled = true;
+            document.getElementById('simBtn').disabled = true;
+            document.getElementById('clearBtn').disabled = true;
+            document.getElementById('undoBtn').disabled = true;
+            document.getElementById('gameStatusText').innerText = "딜러: 카드를 나누는 중...";
+
+            let deck = createDeck();
+            let pCards = [deck.pop(), deck.pop()];
+            let bCards = [deck.pop(), deck.pop()];
+
+            let pEl = document.getElementById('playerCards');
+            let bEl = document.getElementById('bankerCards');
+            pEl.innerHTML = '';
+            bEl.innerHTML = '';
+            document.getElementById('playerScore').innerText = "합계: -";
+            document.getElementById('bankerScore').innerText = "합계: -";
+
+            pEl.innerHTML = getCardHtml(pCards[0], 0) + getCardHtml(pCards[1], 2);
+            bEl.innerHTML = getCardHtml(bCards[0], 1) + getCardHtml(bCards[1], 3);
+            lucide.createIcons();
+            playSound('card');
+            await sleep(600);
+
+            document.getElementById('gameStatusText').innerText = "카드 오픈 중...";
+            await autoFlipCard(0); await sleep(400);
+            await autoFlipCard(1); await sleep(400);
+            await autoFlipCard(2); 
+            let pVal = calculateHandValue(pCards);
+            document.getElementById('playerScore').innerText = `합계: ${pVal}`;
+            await sleep(400);
+            await autoFlipCard(3); 
+            let bVal = calculateHandValue(bCards);
+            document.getElementById('bankerScore').innerText = `합계: ${bVal}`;
+            await sleep(600);
+
+            let natural = (pVal >= 8 || bVal >= 8);
+            let pThird = null;
+
+            if (!natural) {
+                if (pVal <= 5) {
+                    document.getElementById('gameStatusText').innerText = "플레이어 추가 카드";
+                    pThird = deck.pop();
+                    pCards.push(pThird);
+                    pEl.innerHTML += getCardHtml(pThird, 4); 
+                    lucide.createIcons(); playSound('card');
+                    await sleep(600);
+                    await autoFlipCard(4);
+                    pVal = calculateHandValue(pCards);
+                    document.getElementById('playerScore').innerText = `합계: ${pVal}`;
+                    await sleep(500);
+                }
+
+                let bDraw = false;
+                if (!pThird) {
+                    if (bVal <= 5) bDraw = true;
+                } else {
+                    let pv3 = pThird.value;
+                    if (bVal <= 2) bDraw = true;
+                    else if (bVal === 3 && pv3 !== 8) bDraw = true;
+                    else if (bVal === 4 && [2,3,4,5,6,7].includes(pv3)) bDraw = true;
+                    else if (bVal === 5 && [4,5,6,7].includes(pv3)) bDraw = true;
+                    else if (bVal === 6 && [6,7].includes(pv3)) bDraw = true;
+                }
+
+                if (bDraw) {
+                    document.getElementById('gameStatusText').innerText = "뱅커 추가 카드";
+                    let bThird = deck.pop();
+                    bCards.push(bThird);
+                    bEl.innerHTML += getCardHtml(bThird, 5); 
+                    lucide.createIcons(); playSound('card');
+                    await sleep(600);
+                    await autoFlipCard(5);
+                    bVal = calculateHandValue(bCards);
+                    document.getElementById('bankerScore').innerText = `합계: ${bVal}`;
+                    await sleep(500);
+                }
+            }
+
+            let winner = 'tie';
+            if (pVal > bVal) winner = 'player';
+            else if (bVal > pVal) winner = 'banker';
+
+            let pPair = pCards[0].rank === pCards[1].rank;
+            let bPair = bCards[0].rank === bCards[1].rank;
+
+            let statusStr = winner === 'player' ? "🎉 플레이어 승리!" : (winner === 'banker' ? "🎉 뱅커 승리!" : "🤝 무승부 (TIE)");
+            document.getElementById('gameStatusText').innerText = statusStr;
+
+            processPayouts(winner, pPair, bPair);
+            recordHistory(winner, pPair, bPair);
+
+            isDealing = false;
+            document.getElementById('dealBtn').disabled = false;
+            document.getElementById('simBtn').disabled = false;
+            document.getElementById('clearBtn').disabled = false;
+            document.getElementById('undoBtn').disabled = false;
+            betHistoryStack = [];
+            currentBets = { player: 0, banker: 0, tie: 0, playerPair: 0, bankerPair: 0 };
+            updateBetDisplays();
+            roundCount++;
+            document.getElementById('roundNumber').innerText = `#${roundCount}`;
+            saveSessionData();
+        }
+
+        function processPayouts(winner, pPair, bPair) {
+            let profit = 0, totalWinnings = 0;
+            if (winner === 'player') {
+                if (currentBets.player > 0) { totalWinnings += currentBets.player * 2; profit += currentBets.player; }
+                if (currentBets.banker > 0) profit -= currentBets.banker;
+                if (currentBets.tie > 0) profit -= currentBets.tie;
+            } else if (winner === 'banker') {
+                if (currentBets.banker > 0) { let w = currentBets.banker * 0.95; totalWinnings += currentBets.banker + w; profit += w; }
+                if (currentBets.player > 0) profit -= currentBets.player;
+                if (currentBets.tie > 0) profit -= currentBets.tie;
+            } else {
+                if (currentBets.player > 0) totalWinnings += currentBets.player;
+                if (currentBets.banker > 0) totalWinnings += currentBets.banker;
+                if (currentBets.tie > 0) { totalWinnings += currentBets.tie * 9; profit += currentBets.tie * 8; }
+            }
+
+            if (pPair && currentBets.playerPair > 0) { totalWinnings += currentBets.playerPair * 12; profit += currentBets.playerPair * 11; }
+            else if (!pPair && currentBets.playerPair > 0) profit -= currentBets.playerPair;
+
+            if (bPair && currentBets.bankerPair > 0) { totalWinnings += currentBets.bankerPair * 12; profit += currentBets.bankerPair * 11; }
+            else if (!bPair && currentBets.bankerPair > 0) profit -= currentBets.bankerPair;
+
+            // 바카라 연승 카운트
+            if (profit > 0) {
+                streaks.baccarat++;
+            } else if (profit < 0) {
+                streaks.baccarat = 0;
+            }
+
+            balance += totalWinnings;
+            updateBalanceDisplay();
+            if (profit > 0) playSound('win');
+        }
+
+        function recordHistory(winner, pPair, bPair) {
+            stats[winner]++;
+            if (pPair) stats.pPair++;
+            if (bPair) stats.bPair++;
+            updateStatsDisplay();
+
+            roadmapData.push({ winner, pPair, bPair });
+            renderBigRoad();
+
+            let roundProfit = 0;
+            if (winner === 'player') roundProfit = currentBets.player - currentBets.banker;
+            else if (winner === 'banker') roundProfit = (currentBets.banker * 0.95) - currentBets.player;
+            else roundProfit = currentBets.tie * 8;
+
+            roundHistory.unshift({
+                round: roundCount,
+                winner: winner.toUpperCase(),
+                profit: roundProfit,
+                balance: balance
+            });
+            updateHistoryTable();
+            saveSessionData();
+        }
+
+        function updateStatsDisplay() {
+            document.getElementById('statPlayer').innerText = stats.player;
+            document.getElementById('statBanker').innerText = stats.banker;
+            document.getElementById('statTie').innerText = stats.tie;
+        }
+
+        function renderBigRoad() {
+            const grid = document.getElementById('bigRoadGrid');
+            grid.innerHTML = '';
+            let cols = 28, rows = 6;
+            let matrix = Array(rows).fill(0).map(() => Array(cols).fill(null));
+            let c = 0, r = 0;
+
+            roadmapData.forEach((item, idx) => {
+                if (idx > 0) {
+                    let prev = roadmapData[idx - 1];
+                    if (item.winner === prev.winner) {
+                        if (r + 1 < rows && matrix[r + 1][c] === null) r++;
+                        else c++;
+                    } else {
+                        c++; r = 0;
+                        while(c < cols && matrix[r][c] !== null) c++;
+                    }
+                }
+                if (c < cols && r < rows) matrix[r][c] = item;
+            });
+
+            for (
