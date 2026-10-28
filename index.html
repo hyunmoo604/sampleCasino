@@ -17,7 +17,6 @@
             color: #f3f4f6;
             user-select: none;
             -webkit-user-select: none;
-            touch-action: manipulation;
         }
         .serif-font {
             font-family: 'Playfair Display', serif;
@@ -84,6 +83,61 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
+
+    <!-- 탭 전환 함수 선행 정의 (ReferenceError 방지) -->
+    <script>
+        function switchGameMode(mode) {
+            const viewBacc = document.getElementById('viewBaccarat');
+            const viewCrash = document.getElementById('viewCrash');
+            const viewLadder = document.getElementById('viewLadder');
+            const viewExchange = document.getElementById('viewExchange');
+            const viewEvents = document.getElementById('viewEvents');
+
+            const tabBacc = document.getElementById('tabBaccarat');
+            const tabCrash = document.getElementById('tabCrash');
+            const tabLadder = document.getElementById('tabLadder');
+
+            if (!viewBacc || !viewCrash || !viewLadder || !viewExchange || !viewEvents) return;
+
+            // 뷰 숨기기
+            viewBacc.classList.add('hidden');
+            viewCrash.classList.add('hidden');
+            viewLadder.classList.add('hidden');
+            viewExchange.classList.add('hidden');
+            viewEvents.classList.add('hidden');
+
+            // 상단 탭 스타일 초기화
+            tabBacc.className = "py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center justify-center gap-1";
+            tabCrash.className = "py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center justify-center gap-1";
+            tabLadder.className = "py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center justify-center gap-1";
+
+            const globalToolbar = document.getElementById('globalToolbar');
+            const baccaratActionToolbar = document.getElementById('baccaratActionToolbar');
+
+            if (mode === 'baccarat') {
+                viewBacc.classList.remove('hidden');
+                tabBacc.className = "py-2 rounded-lg text-xs font-bold transition bg-amber-600 text-white shadow flex items-center justify-center gap-1";
+                if (globalToolbar) globalToolbar.style.display = 'flex';
+                if (baccaratActionToolbar) baccaratActionToolbar.style.display = 'grid';
+            } else if (mode === 'crash') {
+                viewCrash.classList.remove('hidden');
+                tabCrash.className = "py-2 rounded-lg text-xs font-bold transition bg-emerald-600 text-white shadow flex items-center justify-center gap-1";
+                if (globalToolbar) globalToolbar.style.display = 'flex';
+                if (baccaratActionToolbar) baccaratActionToolbar.style.display = 'none';
+            } else if (mode === 'ladder') {
+                viewLadder.classList.remove('hidden');
+                tabLadder.className = "py-2 rounded-lg text-xs font-bold transition bg-indigo-600 text-white shadow flex items-center justify-center gap-1";
+                if (globalToolbar) globalToolbar.style.display = 'none';
+            } else if (mode === 'exchange') {
+                viewExchange.classList.remove('hidden');
+                if (globalToolbar) globalToolbar.style.display = 'none';
+            } else if (mode === 'events') {
+                viewEvents.classList.remove('hidden');
+                if (globalToolbar) globalToolbar.style.display = 'none';
+                if (typeof updateEventUI === 'function') updateEventUI();
+            }
+        }
+    </script>
 </head>
 <body class="min-h-screen flex flex-col justify-between pb-16 sm:pb-0">
 
@@ -115,7 +169,7 @@
         </div>
     </header>
 
-    <!-- Game Mode Switcher Tabs (3개 게임만 배치) -->
+    <!-- Game Mode Switcher Tabs -->
     <div class="max-w-7xl w-full mx-auto px-2 pt-3">
         <div class="grid grid-cols-3 gap-2 bg-slate-900/80 p-1 rounded-xl border border-slate-800">
             <button onclick="switchGameMode('baccarat')" id="tabBaccarat" class="py-2 rounded-lg text-xs font-bold transition bg-amber-600 text-white shadow flex items-center justify-center gap-1">
@@ -243,10 +297,8 @@
 
                 <div class="flex flex-col items-center justify-center my-auto py-4">
                     <div id="ladderVisualBox" class="w-48 h-36 bg-slate-950 border border-indigo-500/30 rounded-xl p-3 flex justify-between relative overflow-hidden">
-                        <!-- 사다리 줄기 -->
                         <div class="w-2 bg-indigo-500/50 h-full rounded"></div>
                         <div class="w-2 bg-indigo-500/50 h-full rounded"></div>
-                        <!-- 가로 줄 -->
                         <div id="ladderLine1" class="absolute left-3 right-3 top-8 h-1.5 bg-indigo-400 hidden"></div>
                         <div id="ladderLine2" class="absolute left-3 right-3 top-20 h-1.5 bg-indigo-400 hidden"></div>
                         <div id="ladderBall" class="w-5 h-5 rounded-full bg-amber-400 absolute top-1 left-1.5 shadow-lg transition-all duration-700 hidden"></div>
@@ -343,7 +395,7 @@
                     <p class="text-xs text-slate-400 mt-1">다양한 혜택을 수령하고 잔액을 즉시 충전하세요!</p>
                 </div>
 
-                <!-- 이벤트 1: 신규가입 무료 룰렛 (임시 차단 중) -->
+                <!-- 이벤트 1: 신규가입 무료 룰렛 -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-amber-500/30 flex flex-col gap-3">
                     <div class="flex justify-between items-center">
                         <span class="bg-amber-500/20 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-500/30">이벤트 1</span>
@@ -511,7 +563,7 @@
         </div>
     </div>
 
-    <!-- Script -->
+    <!-- 메인 비즈니스 로직 스크립트 -->
     <script>
         let soundEnabled = true;
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -569,7 +621,6 @@
             showToast(soundEnabled ? '효과음 켜짐' : '효과음 꺼짐');
         }
 
-        // 최초 기본 잔액: 300,000₩
         let balance = 300000;
         let selectedChipVal = 10000;
         let currentBets = { player: 0, banker: 0, tie: 0, playerPair: 0, bankerPair: 0 };
@@ -581,17 +632,14 @@
         let isDealing = false;
         let stats = { player: 0, banker: 0, tie: 0, pPair: 0, bPair: 0 };
 
-        // 연승 카운터 상태 변수
         let streaks = { baccarat: 0, crash: 0, ladder: 0 };
         let claimedBonus = { baccarat: {s3:false, s5:false}, crash: {s3:false, s5:false}, ladder: {s3:false, s5:false} };
         let isRouletteUsed = false;
 
-        // 히든 충전 관련 상태 변수
         let rechargeClickCount = 0;
         let rechargeClickTimer = null;
         let isSecretRechargeUsed = false;
 
-        // --- 브라우저 영구 저장/불러오기 기능 (localStorage) ---
         function saveSessionData() {
             const data = {
                 balance: balance,
@@ -630,12 +678,11 @@
                     renderExchangeHistory();
                     updateEventUI();
                 } catch (e) {
-                    console.error("저장 데이터를 불러오는 중 오류 발생", e);
+                    console.error("데이터 로드 에러:", e);
                 }
             }
         }
 
-        // --- 크래시 게임 전용 상태 변수 ---
         let crashBetAmount = 10000;
         let crashGamePhase = 'WAITING';
         let isParticipating = false; 
@@ -647,7 +694,6 @@
         let waitTimerInterval = null;
         let crashHistory = [1.25, 2.40, 1.02, 5.10, 1.15];
 
-        // --- 사다리 게임 전용 상태 변수 ---
         let ladderSelectedSpot = null;
         let ladderIsParticipating = false;
         let ladderTimer = 5;
@@ -656,7 +702,7 @@
         let ladderHistory = [];
 
         window.onload = function() {
-            lucide.createIcons();
+            if (window.lucide) lucide.createIcons();
             loadSessionData();
             updateBalanceDisplay();
             updateBetDisplays();
@@ -666,53 +712,6 @@
             startCrashGameLoop(); 
             startLadderGameLoop();
         };
-
-        function switchGameMode(mode) {
-            const viewBacc = document.getElementById('viewBaccarat');
-            const viewCrash = document.getElementById('viewCrash');
-            const viewLadder = document.getElementById('viewLadder');
-            const viewExchange = document.getElementById('viewExchange');
-            const viewEvents = document.getElementById('viewEvents');
-
-            const tabBacc = document.getElementById('tabBaccarat');
-            const tabCrash = document.getElementById('tabCrash');
-            const tabLadder = document.getElementById('tabLadder');
-
-            // 뷰 숨기기
-            viewBacc.classList.add('hidden');
-            viewCrash.classList.add('hidden');
-            viewLadder.classList.add('hidden');
-            viewExchange.classList.add('hidden');
-            viewEvents.classList.add('hidden');
-
-            // 상단 탭 스타일 초기화
-            tabBacc.className = "py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center justify-center gap-1";
-            tabCrash.className = "py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center justify-center gap-1";
-            tabLadder.className = "py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center justify-center gap-1";
-
-            if (mode === 'baccarat') {
-                viewBacc.classList.remove('hidden');
-                tabBacc.className = "py-2 rounded-lg text-xs font-bold transition bg-amber-600 text-white shadow flex items-center justify-center gap-1";
-                document.getElementById('globalToolbar').style.display = 'flex';
-                document.getElementById('baccaratActionToolbar').style.display = 'grid';
-            } else if (mode === 'crash') {
-                viewCrash.classList.remove('hidden');
-                tabCrash.className = "py-2 rounded-lg text-xs font-bold transition bg-emerald-600 text-white shadow flex items-center justify-center gap-1";
-                document.getElementById('globalToolbar').style.display = 'flex';
-                document.getElementById('baccaratActionToolbar').style.display = 'none';
-            } else if (mode === 'ladder') {
-                viewLadder.classList.remove('hidden');
-                tabLadder.className = "py-2 rounded-lg text-xs font-bold transition bg-indigo-600 text-white shadow flex items-center justify-center gap-1";
-                document.getElementById('globalToolbar').style.display = 'none';
-            } else if (mode === 'exchange') {
-                viewExchange.classList.remove('hidden');
-                document.getElementById('globalToolbar').style.display = 'none';
-            } else if (mode === 'events') {
-                viewEvents.classList.remove('hidden');
-                document.getElementById('globalToolbar').style.display = 'none';
-                updateEventUI();
-            }
-        }
 
         function showToast(title, body="") {
             document.getElementById('msgTitle').innerText = title;
@@ -790,13 +789,11 @@
             }
         }
 
-        // ==================== 이벤트 시스템 로직 ====================
         function updateEventUI() {
             document.getElementById('evtStreakBaccarat').innerText = streaks.baccarat;
             document.getElementById('evtStreakCrash').innerText = streaks.crash;
             document.getElementById('evtStreakLadder').innerText = streaks.ladder;
 
-            // 연승 보너스 버튼 상태 업데이트
             updateStreakBtn('baccarat', 'btnClaimBacc');
             updateStreakBtn('crash', 'btnClaimCrash');
             updateStreakBtn('ladder', 'btnClaimLadder');
@@ -818,25 +815,8 @@
             }
         }
 
-        // 신규가입 룰렛 이벤트 (임시 차단 처리)
         function spinRouletteEvent() {
             showToast("알림", "회원가입 기능 오픈 준비 중입니다. 신규 가입 룰렛 이벤트는 임시 중단되었습니다.");
-            return;
-            
-            /* 추후 기능 오픈 시 주석 해제하여 사용
-            if (isRouletteUsed) return showToast("이미 룰렛 보너스를 수령하셨습니다.");
-            
-            let rewards = [100000, 200000, 300000, 500000, 1000000];
-            let won = rewards[Math.floor(Math.random() * rewards.length)];
-
-            isRouletteUsed = true;
-            balance += won;
-            updateBalanceDisplay();
-            updateEventUI();
-            playSound('win');
-
-            showToast("🎉 축하합니다!", `신규가입 룰렛 당첨!\n무료 보너스 +${won.toLocaleString()} ₩ 이 잔액에 즉시 지급되었습니다.`);
-            */
         }
 
         function claimStreakBonus(gameKey) {
@@ -860,7 +840,6 @@
             }
         }
 
-        // ==================== 실시간 사다리 게임 시스템 ====================
         function selectLadderSpot(spot) {
             if (ladderPhase !== 'WAITING') return showToast("게임 진행 중에는 선택할 수 없습니다.");
             ladderSelectedSpot = spot;
@@ -942,18 +921,16 @@
             const ball = document.getElementById('ladderBall');
             ball.classList.remove('hidden');
 
-            // 결과 무작위 생성 (3줄 / 4줄)
             const isStartLeft = Math.random() < 0.5;
             const lineCount = Math.random() < 0.5 ? 3 : 4;
 
             let isEndLeft = isStartLeft;
-            if (lineCount === 3) isEndLeft = !isStartLeft; // 3줄이면 반대쪽
-            const isOdd = isEndLeft; // 좌=홀, 우=짝
+            if (lineCount === 3) isEndLeft = !isStartLeft;
+            const isOdd = isEndLeft;
 
             let finalKey = (isStartLeft ? 'LEFT' : 'RIGHT') + '_' + (isOdd ? 'ODD' : 'EVEN');
             let finalLabel = (isStartLeft ? '좌' : '우') + '/' + (isOdd ? '홀' : '짝');
 
-            // 애니메이션 연출
             ball.style.top = '4px';
             ball.style.left = isStartLeft ? '6px' : '165px';
             await sleep(400); playSound('tick');
@@ -972,7 +949,6 @@
 
             document.getElementById('ladderResultText').innerText = `🎉 ${finalLabel}`;
             
-            // 배팅 정산
             if (ladderIsParticipating && ladderSelectedSpot) {
                 const amt = parseInt(document.getElementById('ladderBetAmountInput').value || 0, 10);
                 if (ladderSelectedSpot === finalKey) {
@@ -996,7 +972,6 @@
             }, 3000);
         }
 
-        // ==================== 환전 시스템 로직 ====================
         function addExchangeAmount(amt) {
             const input = document.getElementById('exchangeAmountInput');
             let current = parseInt(input.value || 0, 10);
@@ -1042,7 +1017,6 @@
             });
         }
 
-        // ==================== 그래프 게임 루프 ====================
         function setCrashBet(amount) {
             if (crashGamePhase === 'RUNNING') return showToast("게임 상승 중에는 배팅금을 바꿀 수 없습니다.");
             if (balance < amount) return showToast("잔액이 부족합니다.");
@@ -1194,7 +1168,6 @@
             }, 3000);
         }
 
-        // ==================== 바카라 엔진 로직 ====================
         function createDeck() {
             const suits = ['♠', '♥', '♦', '♣'];
             const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
@@ -1361,7 +1334,7 @@
 
             pEl.innerHTML = getCardHtml(pCards[0], 0) + getCardHtml(pCards[1], 2);
             bEl.innerHTML = getCardHtml(bCards[0], 1) + getCardHtml(bCards[1], 3);
-            lucide.createIcons();
+            if (window.lucide) lucide.createIcons();
             playSound('card');
             await sleep(600);
 
@@ -1386,7 +1359,7 @@
                     pThird = deck.pop();
                     pCards.push(pThird);
                     pEl.innerHTML += getCardHtml(pThird, 4); 
-                    lucide.createIcons(); playSound('card');
+                    if (window.lucide) lucide.createIcons(); playSound('card');
                     await sleep(600);
                     await autoFlipCard(4);
                     pVal = calculateHandValue(pCards);
@@ -1411,7 +1384,7 @@
                     let bThird = deck.pop();
                     bCards.push(bThird);
                     bEl.innerHTML += getCardHtml(bThird, 5); 
-                    lucide.createIcons(); playSound('card');
+                    if (window.lucide) lucide.createIcons(); playSound('card');
                     await sleep(600);
                     await autoFlipCard(5);
                     bVal = calculateHandValue(bCards);
@@ -1468,7 +1441,6 @@
             if (bPair && currentBets.bankerPair > 0) { totalWinnings += currentBets.bankerPair * 12; profit += currentBets.bankerPair * 11; }
             else if (!bPair && currentBets.bankerPair > 0) profit -= currentBets.bankerPair;
 
-            // 바카라 연승 카운트
             if (profit > 0) {
                 streaks.baccarat++;
             } else if (profit < 0) {
@@ -1531,4 +1503,101 @@
                 if (c < cols && r < rows) matrix[r][c] = item;
             });
 
-            for (
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    let cell = document.createElement('div');
+                    cell.className = "w-5 h-5 rounded flex items-center justify-center text-[8px] font-bold relative m-auto";
+                    let d = matrix[row][col];
+                    if (d) {
+                        let bg = d.winner === 'player' ? 'bg-blue-600 text-white' : (d.winner === 'banker' ? 'bg-red-600 text-white' : 'bg-emerald-500 text-white');
+                        cell.className += ` ${bg} shadow-sm`;
+                        cell.innerText = d.winner === 'player' ? 'P' : (d.winner === 'banker' ? 'B' : 'T');
+                        if (d.pPair || d.bPair) {
+                            let dot = document.createElement('span');
+                            dot.className = "absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-amber-400";
+                            cell.appendChild(dot);
+                        }
+                    } else {
+                        cell.className += " bg-slate-900/40 border border-slate-800/40";
+                    }
+                    grid.appendChild(cell);
+                }
+            }
+        }
+
+        function resetRoadmap() {
+            roadmapData = [];
+            stats = { player: 0, banker: 0, tie: 0, pPair: 0, bPair: 0 };
+            roundCount = 1;
+            roundHistory = [];
+            renderBigRoad();
+            document.getElementById('roundNumber').innerText = '#1';
+            updateStatsDisplay();
+            updateHistoryTable();
+            saveSessionData();
+            showToast("스코어보드가 초기화되었습니다.");
+        }
+
+        function updateHistoryTable() {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+            if (roundHistory.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-500">배팅 이력이 없습니다.</td></tr>`;
+                return;
+            }
+            roundHistory.slice(0, 50).forEach(h => {
+                let tr = document.createElement('tr');
+                let pCol = h.profit > 0 ? 'text-emerald-400 font-bold' : (h.profit < 0 ? 'text-red-400 font-bold' : 'text-slate-300');
+                tr.innerHTML = `
+                    <td class="p-2 font-mono">#${h.round}</td>
+                    <td class="p-2 font-bold ${h.winner==='PLAYER'?'text-blue-400':(h.winner==='BANKER'?'text-red-400':'text-emerald-400')}">${h.winner}</td>
+                    <td class="p-2 ${pCol}">${(h.profit>0?'+':'')+h.profit.toLocaleString()}₩</td>
+                    <td class="p-2 font-mono text-amber-300">${h.balance.toLocaleString()}₩</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('historySummaryText').innerText = `총 ${roundHistory.length} 라운드`;
+        }
+
+        function openRechargeModal() { 
+            if (rechargeClickTimer) clearTimeout(rechargeClickTimer);
+            rechargeClickCount++;
+
+            rechargeClickTimer = setTimeout(() => {
+                if (rechargeClickCount < 5) {
+                    showToast("알림", "충전 기능이 임시로 중단되었습니다.");
+                }
+                rechargeClickCount = 0;
+            }, 1500);
+
+            if (rechargeClickCount >= 5) {
+                clearTimeout(rechargeClickTimer);
+                rechargeClickCount = 0;
+
+                if (isSecretRechargeUsed) {
+                    return showToast("알림", "이미 히든 충전 기회를 사용하셨습니다. 더 이상 충전할 수 없습니다.");
+                }
+
+                setTimeout(() => {
+                    const inputCode = prompt("히든 충전 코드를 입력하세요:");
+                    if (inputCode === null) return;
+
+                    if (inputCode.trim() === '유선영병신') {
+                        balance += 500000;
+                        isSecretRechargeUsed = true;
+                        updateBalanceDisplay();
+                        playSound('win');
+                        showToast("🎉 성공!", "히든 코드가 인증되었습니다!\n500,000 ₩ 이 특별 충전되었습니다. (1회 제한 완료)");
+                    } else {
+                        showToast("오류", "잘못된 코드입니다.");
+                    }
+                }, 100);
+            }
+        }
+
+        function openHistoryModal() { document.getElementById('historyModal').classList.remove('hidden'); }
+        function closeHistoryModal() { document.getElementById('historyModal').classList.add('hidden'); }
+        function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+    </script>
+</body>
+</html>
