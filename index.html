@@ -18,9 +18,7 @@
             user-select: none;
             -webkit-user-select: none;
         }
-        .serif-font {
-            font-family: 'Playfair Display', serif;
-        }
+        .serif-font { font-family: 'Playfair Display', serif; }
         .casino-felt {
             background: radial-gradient(circle at center, #1b4d3e 0%, #0d2820 70%, #061410 100%);
             box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
@@ -37,9 +35,7 @@
             border: 2px solid #d4af37;
             box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
         }
-        .gold-border-sm {
-            border: 1px solid #d4af37;
-        }
+        .gold-border-sm { border: 1px solid #d4af37; }
         .gold-text {
             color: #d4af37;
             text-shadow: 0 2px 4px rgba(0,0,0,0.6);
@@ -50,9 +46,7 @@
             font-weight: 700;
             transition: all 0.2s ease;
         }
-        .gold-gradient-btn:active {
-            transform: scale(0.96);
-        }
+        .gold-gradient-btn:active { transform: scale(0.96); }
         
         /* 카드 스타일 */
         .card-container {
@@ -84,7 +78,7 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 
-    <!-- 탭 전환 함수 선행 정의 (ReferenceError 방지) -->
+    <!-- 탭 전환 함수 선행 정의 -->
     <script>
         function switchGameMode(mode) {
             const viewBacc = document.getElementById('viewBaccarat');
@@ -99,14 +93,12 @@
 
             if (!viewBacc || !viewCrash || !viewLadder || !viewExchange || !viewEvents) return;
 
-            // 뷰 숨기기
             viewBacc.classList.add('hidden');
             viewCrash.classList.add('hidden');
             viewLadder.classList.add('hidden');
             viewExchange.classList.add('hidden');
             viewEvents.classList.add('hidden');
 
-            // 상단 탭 스타일 초기화
             tabBacc.className = "py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center justify-center gap-1";
             tabCrash.className = "py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center justify-center gap-1";
             tabLadder.className = "py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center justify-center gap-1";
@@ -226,6 +218,7 @@
                         <div id="bankerCards" class="flex gap-1 min-h-[95px] items-center justify-center"></div>
                     </div>
                 </div>
+                <!-- 배율 업데이트: PLAYER 2배, BANKER 1.95배 -->
                 <div class="grid grid-cols-3 sm:grid-cols-5 gap-1.5 my-1">
                     <div onclick="placeBet('playerPair')" class="betting-spot bg-blue-950/70 border border-blue-500/40 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer active:scale-95 transition relative min-h-[65px]">
                         <span class="text-[10px] font-bold text-blue-300">P.PAIR</span>
@@ -234,7 +227,7 @@
                     </div>
                     <div onclick="placeBet('player')" class="betting-spot col-span-2 sm:col-span-1 bg-blue-900/70 border-2 border-blue-400 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer active:scale-95 transition relative min-h-[65px]">
                         <span class="text-xs font-extrabold text-white">PLAYER</span>
-                        <span class="text-[9px] text-blue-200 font-mono">1:1</span>
+                        <span class="text-[9px] text-blue-200 font-mono">2.00배</span>
                         <div class="absolute bottom-1 bg-slate-900 px-2 py-0.2 rounded border border-amber-500/30 text-[10px] font-mono text-amber-400" id="bet-player">0 ₩</div>
                     </div>
                     <div onclick="placeBet('tie')" class="betting-spot col-span-3 sm:col-span-1 bg-emerald-950/70 border border-emerald-500/40 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer active:scale-95 transition relative min-h-[65px]">
@@ -244,7 +237,7 @@
                     </div>
                     <div onclick="placeBet('banker')" class="betting-spot col-span-2 sm:col-span-1 bg-red-900/70 border-2 border-red-400 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer active:scale-95 transition relative min-h-[65px]">
                         <span class="text-xs font-extrabold text-white">BANKER</span>
-                        <span class="text-[9px] text-red-200 font-mono">1:0.95</span>
+                        <span class="text-[9px] text-red-200 font-mono">1.95배</span>
                         <div class="absolute bottom-1 bg-slate-900 px-2 py-0.2 rounded border border-amber-500/30 text-[10px] font-mono text-amber-400" id="bet-banker">0 ₩</div>
                     </div>
                     <div onclick="placeBet('bankerPair')" class="betting-spot bg-red-950/70 border border-red-500/40 rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer active:scale-95 transition relative min-h-[65px]">
@@ -287,37 +280,46 @@
             </section>
         </div>
 
-        <!-- ==================== 사다리게임 뷰 ==================== -->
+        <!-- ==================== 사다리게임 뷰 (네이버 스타일 Canvas 애니메이션 적용) ==================== -->
         <div id="viewLadder" class="flex flex-col gap-3 flex-1 hidden">
             <section class="flex-1 ladder-felt border border-indigo-500/30 rounded-2xl p-4 flex flex-col justify-between relative shadow-2xl min-h-[380px]">
                 <div class="flex justify-between items-center bg-slate-950/80 px-4 py-2 rounded-xl border border-indigo-500/20">
-                    <div class="text-xs text-slate-400">최근 결과: <span id="ladderHistoryList" class="font-mono text-indigo-300">좌/짝, 우/홀</span></div>
-                    <div class="text-xs font-bold text-indigo-400">실시간 사다리 (1.95배)</div>
+                    <div class="text-xs text-slate-400">최근 결과: <span id="ladderHistoryList" class="font-mono text-indigo-300">좌4짝, 우3홀</span></div>
+                    <div class="text-xs font-bold text-indigo-400">실시간 사다리 (네이버 스타일)</div>
                 </div>
 
-                <div class="flex flex-col items-center justify-center my-auto py-4">
-                    <div id="ladderVisualBox" class="w-48 h-36 bg-slate-950 border border-indigo-500/30 rounded-xl p-3 flex justify-between relative overflow-hidden">
-                        <div class="w-2 bg-indigo-500/50 h-full rounded"></div>
-                        <div class="w-2 bg-indigo-500/50 h-full rounded"></div>
-                        <div id="ladderLine1" class="absolute left-3 right-3 top-8 h-1.5 bg-indigo-400 hidden"></div>
-                        <div id="ladderLine2" class="absolute left-3 right-3 top-20 h-1.5 bg-indigo-400 hidden"></div>
-                        <div id="ladderBall" class="w-5 h-5 rounded-full bg-amber-400 absolute top-1 left-1.5 shadow-lg transition-all duration-700 hidden"></div>
+                <div class="flex flex-col items-center justify-center my-auto py-2">
+                    <div class="w-64 h-52 bg-slate-950/90 border border-indigo-500/40 rounded-xl p-2 relative shadow-inner flex flex-col items-center justify-center">
+                        <canvas id="ladderCanvas" width="230" height="170" class="block"></canvas>
                     </div>
-                    <div id="ladderResultText" class="serif-font text-2xl font-black text-amber-300 mt-3">대기 중...</div>
-                    <p id="ladderTimerText" class="text-xs text-indigo-200 mt-1">⏳ 다음 게임 시작까지 5초 남았습니다</p>
+                    <div id="ladderResultText" class="serif-font text-2xl font-black text-amber-300 mt-2">대기 중...</div>
+                    <p id="ladderTimerText" class="text-xs text-indigo-200 mt-0.5">⏳ 다음 게임 시작까지 5초 남았습니다</p>
                 </div>
 
                 <div class="bg-slate-950/90 p-3 rounded-xl border border-slate-800 flex flex-col gap-2">
                     <div class="text-[11px] text-slate-400 flex justify-between">
-                        <span>배팅 선택 (1.95배)</span>
+                        <span>배팅 선택</span>
                         <span>선택: <strong id="ladderSelectedSpotDisplay" class="text-amber-400">미선택</strong></span>
                     </div>
+
+                    <!-- 단식 1.95배 -->
+                    <div class="text-[10px] font-bold text-indigo-300">단식 (1.95배)</div>
                     <div class="grid grid-cols-4 gap-1.5">
-                        <button onclick="selectLadderSpot('LEFT_ODD')" id="btnLadderLEFT_ODD" class="bg-slate-800 py-2 rounded-lg text-xs font-bold border border-slate-700 text-slate-300">좌/홀</button>
-                        <button onclick="selectLadderSpot('LEFT_EVEN')" id="btnLadderLEFT_EVEN" class="bg-slate-800 py-2 rounded-lg text-xs font-bold border border-slate-700 text-slate-300">좌/짝</button>
-                        <button onclick="selectLadderSpot('RIGHT_ODD')" id="btnLadderRIGHT_ODD" class="bg-slate-800 py-2 rounded-lg text-xs font-bold border border-slate-700 text-slate-300">우/홀</button>
-                        <button onclick="selectLadderSpot('RIGHT_EVEN')" id="btnLadderRIGHT_EVEN" class="bg-slate-800 hover:bg-slate-700 py-2 rounded-lg text-xs font-bold border border-slate-700 text-slate-300">우/짝</button>
+                        <button onclick="selectLadderSpot('LEFT')" id="btnLadderLEFT" class="bg-slate-800 py-1.5 rounded-lg text-xs font-bold border border-slate-700 text-slate-300">좌 (LEFT)</button>
+                        <button onclick="selectLadderSpot('RIGHT')" id="btnLadderRIGHT" class="bg-slate-800 py-1.5 rounded-lg text-xs font-bold border border-slate-700 text-slate-300">우 (RIGHT)</button>
+                        <button onclick="selectLadderSpot('ODD')" id="btnLadderODD" class="bg-slate-800 py-1.5 rounded-lg text-xs font-bold border border-slate-700 text-slate-300">홀 (ODD)</button>
+                        <button onclick="selectLadderSpot('EVEN')" id="btnLadderEVEN" class="bg-slate-800 py-1.5 rounded-lg text-xs font-bold border border-slate-700 text-slate-300">짝 (EVEN)</button>
                     </div>
+
+                    <!-- 조합 3.80배 (좌4홀, 좌3짝, 우3홀, 우4짝) -->
+                    <div class="text-[10px] font-bold text-amber-400 mt-1">조합 (3.80배)</div>
+                    <div class="grid grid-cols-4 gap-1.5">
+                        <button onclick="selectLadderSpot('LEFT_4_ODD')" id="btnLadderLEFT_4_ODD" class="bg-slate-800 py-1.5 rounded-lg text-xs font-bold border border-slate-700 text-slate-300">좌4홀</button>
+                        <button onclick="selectLadderSpot('LEFT_3_EVEN')" id="btnLadderLEFT_3_EVEN" class="bg-slate-800 py-1.5 rounded-lg text-xs font-bold border border-slate-700 text-slate-300">좌3짝</button>
+                        <button onclick="selectLadderSpot('RIGHT_3_ODD')" id="btnLadderRIGHT_3_ODD" class="bg-slate-800 py-1.5 rounded-lg text-xs font-bold border border-slate-700 text-slate-300">우3홀</button>
+                        <button onclick="selectLadderSpot('RIGHT_4_EVEN')" id="btnLadderRIGHT_4_EVEN" class="bg-slate-800 py-1.5 rounded-lg text-xs font-bold border border-slate-700 text-slate-300">우4짝</button>
+                    </div>
+
                     <div class="flex items-center gap-2 mt-1">
                         <input type="number" id="ladderBetAmountInput" value="10000" step="5000" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-xs text-amber-400 font-mono">
                         <button onclick="toggleLadderParticipation()" id="ladderJoinBtn" class="w-1/2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-lg text-xs shadow transition">
@@ -384,7 +386,7 @@
             </section>
         </div>
 
-        <!-- ==================== 이벤트 뷰 ==================== -->
+        <!-- ==================== 이벤트 뷰 (연승 보너스 버튼 분리 적용) ==================== -->
         <div id="viewEvents" class="flex flex-col gap-3 flex-1 hidden">
             <section class="bg-slate-900/90 gold-border-sm rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col gap-4">
                 <div class="border-b border-amber-600/30 pb-3">
@@ -408,43 +410,55 @@
                     </button>
                 </div>
 
-                <!-- 이벤트 2: 게임별 연승 보너스 -->
+                <!-- 이벤트 2: 게임별 3연승/5연승 각각 개별 수령 버튼 -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-indigo-500/30 flex flex-col gap-3">
                     <div class="flex justify-between items-center">
                         <span class="bg-indigo-500/20 text-indigo-400 text-[10px] font-bold px-2 py-0.5 rounded border border-indigo-500/30">이벤트 2</span>
                         <span class="text-[11px] text-amber-300 font-bold">상시 진행</span>
                     </div>
                     <h3 class="text-sm font-bold text-white">🔥 전 게임 3연승 / 5연승 보너스 이벤트</h3>
-                    <p class="text-xs text-slate-400">바카라, 그래프(2.0x 이상), 사다리게임에서 연승을 달성하고 보너스를 즉시 수령하세요!</p>
+                    <p class="text-xs text-slate-400">바카라, 그래프(2.0x 이상), 사다리게임에서 연승을 달성하면 3연승(5만)/5연승(10만) 보너스를 각각 수령하세요!</p>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs pt-1">
-                        <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 flex flex-col justify-between">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
+                        <!-- 바카라 -->
+                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex flex-col justify-between gap-2">
                             <div>
                                 <span class="text-blue-400 font-bold">♠ 바카라</span>
                                 <p class="text-[11px] text-slate-400 mt-0.5">현재 연승: <strong id="evtStreakBaccarat" class="text-amber-400 font-mono">0</strong>회</p>
                             </div>
-                            <button onclick="claimStreakBonus('baccarat')" id="btnClaimBacc" class="mt-2 bg-slate-800 text-slate-500 py-1 rounded text-[11px] font-bold cursor-not-allowed">3/5연승 보너스 수령</button>
+                            <div class="flex flex-col gap-1">
+                                <button onclick="claimStreakBonus('baccarat', 3)" id="btnClaimBacc3" class="bg-slate-800 text-slate-500 py-1.5 rounded text-[11px] font-bold cursor-not-allowed">🎁 3연승 수령 (5만 ₩)</button>
+                                <button onclick="claimStreakBonus('baccarat', 5)" id="btnClaimBacc5" class="bg-slate-800 text-slate-500 py-1.5 rounded text-[11px] font-bold cursor-not-allowed">🎁 5연승 수령 (10만 ₩)</button>
+                            </div>
                         </div>
-                        <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 flex flex-col justify-between">
+                        <!-- 그래프 -->
+                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex flex-col justify-between gap-2">
                             <div>
                                 <span class="text-emerald-400 font-bold">🚀 그래프 (2.0x↑)</span>
                                 <p class="text-[11px] text-slate-400 mt-0.5">현재 연승: <strong id="evtStreakCrash" class="text-amber-400 font-mono">0</strong>회</p>
                             </div>
-                            <button onclick="claimStreakBonus('crash')" id="btnClaimCrash" class="mt-2 bg-slate-800 text-slate-500 py-1 rounded text-[11px] font-bold cursor-not-allowed">3/5연승 보너스 수령</button>
+                            <div class="flex flex-col gap-1">
+                                <button onclick="claimStreakBonus('crash', 3)" id="btnClaimCrash3" class="bg-slate-800 text-slate-500 py-1.5 rounded text-[11px] font-bold cursor-not-allowed">🎁 3연승 수령 (5만 ₩)</button>
+                                <button onclick="claimStreakBonus('crash', 5)" id="btnClaimCrash5" class="bg-slate-800 text-slate-500 py-1.5 rounded text-[11px] font-bold cursor-not-allowed">🎁 5연승 수령 (10만 ₩)</button>
+                            </div>
                         </div>
-                        <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 flex flex-col justify-between">
+                        <!-- 사다리 -->
+                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex flex-col justify-between gap-2">
                             <div>
                                 <span class="text-indigo-400 font-bold">🪜 사다리</span>
                                 <p class="text-[11px] text-slate-400 mt-0.5">현재 연승: <strong id="evtStreakLadder" class="text-amber-400 font-mono">0</strong>회</p>
                             </div>
-                            <button onclick="claimStreakBonus('ladder')" id="btnClaimLadder" class="mt-2 bg-slate-800 text-slate-500 py-1 rounded text-[11px] font-bold cursor-not-allowed">3/5연승 보너스 수령</button>
+                            <div class="flex flex-col gap-1">
+                                <button onclick="claimStreakBonus('ladder', 3)" id="btnClaimLadder3" class="bg-slate-800 text-slate-500 py-1.5 rounded text-[11px] font-bold cursor-not-allowed">🎁 3연승 수령 (5만 ₩)</button>
+                                <button onclick="claimStreakBonus('ladder', 5)" id="btnClaimLadder5" class="bg-slate-800 text-slate-500 py-1.5 rounded text-[11px] font-bold cursor-not-allowed">🎁 5연승 수령 (10만 ₩)</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
         </div>
 
-        <!-- Control Toolbar & Chips -->
+        <!-- Control Toolbar & Chips (+ ALL IN 버튼 추가) -->
         <section id="globalToolbar" class="bg-slate-900/95 gold-border-sm rounded-xl p-3 flex flex-col gap-2.5 shadow-xl">
             <div class="flex items-center justify-between gap-1 overflow-x-auto no-scrollbar py-1">
                 <button onclick="selectChip(1000)" class="chip-btn w-9 h-9 rounded-full bg-slate-200 text-slate-900 font-bold text-[10px] border-2 border-dashed border-slate-400 shadow flex items-center justify-center flex-shrink-0" data-val="1000">1K</button>
@@ -452,7 +466,10 @@
                 <button onclick="selectChip(10000)" class="chip-btn w-9 h-9 rounded-full bg-blue-600 text-white font-bold text-[10px] border-2 border-dashed border-blue-400 shadow flex items-center justify-center flex-shrink-0" data-val="10000">10K</button>
                 <button onclick="selectChip(50000)" class="chip-btn w-9 h-9 rounded-full bg-emerald-600 text-white font-bold text-[10px] border-2 border-dashed border-emerald-400 shadow flex items-center justify-center flex-shrink-0" data-val="50000">50K</button>
                 <button onclick="selectChip(100000)" class="chip-btn w-9 h-9 rounded-full bg-purple-600 text-white font-bold text-[10px] border-2 border-dashed border-purple-400 shadow flex items-center justify-center flex-shrink-0" data-val="100000">100K</button>
-                <button onclick="selectChip(1000000)" class="chip-btn w-9 h-9 rounded-full bg-amber-500 text-slate-950 font-bold text-[10px] border-2 border-dashed border-amber-300 shadow flex items-center justify-center flex-shrink-0 ring-1 ring-amber-400" data-val="1000000">1M</button>
+                <button onclick="selectChip(1000000)" class="chip-btn w-9 h-9 rounded-full bg-amber-500 text-slate-950 font-bold text-[10px] border-2 border-dashed border-amber-300 shadow flex items-center justify-center flex-shrink-0" data-val="1000000">1M</button>
+                
+                <!-- 올인 버튼 -->
+                <button onclick="selectChip('ALL_IN')" class="chip-btn px-2.5 h-9 rounded-full bg-red-700 hover:bg-red-600 text-white font-black text-[11px] border-2 border-red-400 shadow flex items-center justify-center flex-shrink-0 animate-pulse" data-val="ALL_IN">🔥 ALL IN</button>
             </div>
 
             <div id="baccaratActionToolbar" class="grid grid-cols-4 gap-1.5">
@@ -471,29 +488,24 @@
 
     </main>
 
-    <!-- Mobile Bottom Navigation Bar (하단 고정 메뉴 순서 재정렬) -->
+    <!-- Mobile Bottom Navigation Bar -->
     <nav class="fixed bottom-0 left-0 right-0 bg-slate-950 border-t border-slate-800 flex justify-around items-center py-2 z-40 sm:hidden">
-        <!-- 1. 이력보기 -->
         <button onclick="openHistoryModal()" class="flex flex-col items-center text-slate-400 hover:text-amber-400 text-[10px]">
             <i data-lucide="history" class="w-5 h-5 mb-0.5"></i>
             <span>이력보기</span>
         </button>
-        <!-- 2. 내정보 -->
         <button onclick="openMyInfoModal()" class="flex flex-col items-center text-slate-400 hover:text-amber-400 text-[10px]">
             <i data-lucide="user" class="w-5 h-5 mb-0.5"></i>
             <span>내정보</span>
         </button>
-        <!-- 3. 충전신청 -->
         <button onclick="openRechargeModal()" class="flex flex-col items-center text-slate-400 hover:text-amber-400 text-[10px]">
             <i data-lucide="wallet" class="w-5 h-5 mb-0.5"></i>
             <span>충전신청</span>
         </button>
-        <!-- 4. 환전신청 -->
         <button onclick="switchGameMode('exchange')" class="flex flex-col items-center text-slate-400 hover:text-amber-400 text-[10px]">
             <i data-lucide="arrow-right-left" class="w-5 h-5 mb-0.5 text-amber-400"></i>
             <span class="text-amber-400 font-bold">환전신청</span>
         </button>
-        <!-- 5. 이벤트 -->
         <button onclick="switchGameMode('events')" class="flex flex-col items-center text-slate-400 hover:text-amber-400 text-[10px]">
             <i data-lucide="gift" class="w-5 h-5 mb-0.5 text-pink-400"></i>
             <span class="text-pink-400 font-bold">이벤트</span>
@@ -563,7 +575,7 @@
         </div>
     </div>
 
-    <!-- 메인 비즈니스 로직 스크립트 -->
+    <!-- 스크립트 영역 -->
     <script>
         let soundEnabled = true;
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -617,7 +629,7 @@
         function toggleSound() {
             soundEnabled = !soundEnabled;
             document.getElementById('soundIcon').setAttribute('data-lucide', soundEnabled ? 'volume-2' : 'volume-x');
-            lucide.createIcons();
+            if (window.lucide) lucide.createIcons();
             showToast(soundEnabled ? '효과음 켜짐' : '효과음 꺼짐');
         }
 
@@ -633,7 +645,11 @@
         let stats = { player: 0, banker: 0, tie: 0, pPair: 0, bPair: 0 };
 
         let streaks = { baccarat: 0, crash: 0, ladder: 0 };
-        let claimedBonus = { baccarat: {s3:false, s5:false}, crash: {s3:false, s5:false}, ladder: {s3:false, s5:false} };
+        let claimedBonus = { 
+            baccarat: {s3:false, s5:false}, 
+            crash: {s3:false, s5:false}, 
+            ladder: {s3:false, s5:false} 
+        };
         let isRouletteUsed = false;
 
         let rechargeClickCount = 0;
@@ -698,7 +714,6 @@
         let ladderIsParticipating = false;
         let ladderTimer = 5;
         let ladderPhase = 'WAITING';
-        let ladderLoopInterval = null;
         let ladderHistory = [];
 
         window.onload = function() {
@@ -710,6 +725,7 @@
             renderBigRoad();
             updateCrashHistoryUI();
             startCrashGameLoop(); 
+            initLadderCanvas();
             startLadderGameLoop();
         };
 
@@ -728,17 +744,22 @@
         function closeMyInfoModal() { document.getElementById('myInfoModal').classList.add('hidden'); }
 
         function selectChip(val) {
-            selectedChipVal = val;
+            if (val === 'ALL_IN') {
+                selectedChipVal = balance > 0 ? balance : 10000;
+            } else {
+                selectedChipVal = val;
+            }
             highlightSelectedChip();
             playSound('chip');
             if (!document.getElementById('viewCrash').classList.contains('hidden')) {
-                setCrashBet(val);
+                setCrashBet(selectedChipVal);
             }
         }
 
         function highlightSelectedChip() {
             document.querySelectorAll('.chip-btn').forEach(btn => {
-                if (parseInt(btn.getAttribute('data-val')) === selectedChipVal) {
+                const attrVal = btn.getAttribute('data-val');
+                if ((attrVal === 'ALL_IN' && selectedChipVal === balance) || parseInt(attrVal) === selectedChipVal) {
                     btn.classList.add('ring-2', 'ring-amber-400', 'scale-105');
                 } else {
                     btn.classList.remove('ring-2', 'ring-amber-400', 'scale-105');
@@ -749,9 +770,10 @@
         function placeBet(spot) {
             if (isDealing) return showToast("게임 진행 중에는 배팅할 수 없습니다.");
             if (balance < selectedChipVal) return showToast("잔액이 부족합니다.");
-            balance -= selectedChipVal;
-            currentBets[spot] += selectedChipVal;
-            betHistoryStack.push({ spot, val: selectedChipVal });
+            let betAmt = selectedChipVal;
+            balance -= betAmt;
+            currentBets[spot] += betAmt;
+            betHistoryStack.push({ spot, val: betAmt });
             updateBalanceDisplay();
             updateBetDisplays();
             playSound('chip');
@@ -789,29 +811,38 @@
             }
         }
 
+        // ==================== 이벤트 시스템 로직 (3연승/5연승 독립 수령) ====================
         function updateEventUI() {
             document.getElementById('evtStreakBaccarat').innerText = streaks.baccarat;
             document.getElementById('evtStreakCrash').innerText = streaks.crash;
             document.getElementById('evtStreakLadder').innerText = streaks.ladder;
 
-            updateStreakBtn('baccarat', 'btnClaimBacc');
-            updateStreakBtn('crash', 'btnClaimCrash');
-            updateStreakBtn('ladder', 'btnClaimLadder');
+            ['baccarat', 'crash', 'ladder'].forEach(gameKey => {
+                updateStreakBtn(gameKey, 3);
+                updateStreakBtn(gameKey, 5);
+            });
         }
 
-        function updateStreakBtn(gameKey, btnId) {
+        function updateStreakBtn(gameKey, targetStreak) {
+            const btnId = `btnClaim${gameKey.charAt(0).toUpperCase() + gameKey.slice(1)}${targetStreak}`;
             const btn = document.getElementById(btnId);
-            const s = streaks[gameKey];
-            const c = claimedBonus[gameKey];
+            if (!btn) return;
 
-            if ((s >= 3 && !c.s3) || (s >= 5 && !c.s5)) {
+            const currentStreak = streaks[gameKey];
+            const isClaimed = targetStreak === 3 ? claimedBonus[gameKey].s3 : claimedBonus[gameKey].s5;
+
+            if (currentStreak >= targetStreak && !isClaimed) {
                 btn.disabled = false;
-                btn.className = "mt-2 gold-gradient-btn text-slate-950 py-1.5 rounded text-[11px] font-bold shadow animate-bounce";
-                btn.innerText = s >= 5 ? "🎁 5연승 10만원 수령!" : "🎁 3연승 5만원 수령!";
+                btn.className = "gold-gradient-btn text-slate-950 py-1.5 rounded text-[11px] font-bold shadow animate-bounce";
+                btn.innerText = `🎁 ${targetStreak}연승 수령 (${targetStreak === 3 ? '5만' : '10만'} ₩)`;
+            } else if (isClaimed) {
+                btn.disabled = true;
+                btn.className = "bg-slate-800 text-slate-600 py-1.5 rounded text-[11px] font-bold cursor-not-allowed";
+                btn.innerText = `✅ ${targetStreak}연승 수령완료`;
             } else {
                 btn.disabled = true;
-                btn.className = "mt-2 bg-slate-800 text-slate-500 py-1 rounded text-[11px] font-bold cursor-not-allowed";
-                btn.innerText = "3/5연승 보너스 수령";
+                btn.className = "bg-slate-800 text-slate-500 py-1.5 rounded text-[11px] font-bold cursor-not-allowed";
+                btn.innerText = `🎁 ${targetStreak}연승 수령 (${targetStreak === 3 ? '5만' : '10만'} ₩)`;
             }
         }
 
@@ -819,45 +850,97 @@
             showToast("알림", "회원가입 기능 오픈 준비 중입니다. 신규 가입 룰렛 이벤트는 임시 중단되었습니다.");
         }
 
-        function claimStreakBonus(gameKey) {
-            const s = streaks[gameKey];
+        function claimStreakBonus(gameKey, targetStreak) {
+            const currentStreak = streaks[gameKey];
             const c = claimedBonus[gameKey];
 
-            if (s >= 5 && !c.s5) {
-                c.s5 = true;
-                balance += 100000;
-                updateBalanceDisplay();
-                updateEventUI();
-                playSound('win');
-                showToast("🎉 5연승 보너스 달성!", "5연승 축하 보너스 +100,000 ₩ 이 지급되었습니다!");
-            } else if (s >= 3 && !c.s3) {
+            if (targetStreak === 3 && currentStreak >= 3 && !c.s3) {
                 c.s3 = true;
                 balance += 50000;
                 updateBalanceDisplay();
                 updateEventUI();
                 playSound('win');
-                showToast("🎉 3연승 보너스 달성!", "3연승 축하 보너스 +50,000 ₩ 이 지급되었습니다!");
+                showToast("🎉 3연승 보너스 달성!", "3연승 보너스 +50,000 ₩ 이 잔액에 즉시 지급되었습니다!");
+            } else if (targetStreak === 5 && currentStreak >= 5 && !c.s5) {
+                c.s5 = true;
+                balance += 100000;
+                updateBalanceDisplay();
+                updateEventUI();
+                playSound('win');
+                showToast("🎉 5연승 보너스 달성!", "5연승 보너스 +100,000 ₩ 이 잔액에 즉시 지급되었습니다!");
             }
+        }
+
+        // ==================== 네이버 스타일 실시간 사다리 타기 Canvas 엔진 ====================
+        let ladderCanvas, ladderCtx;
+        function initLadderCanvas() {
+            ladderCanvas = document.getElementById('ladderCanvas');
+            if (ladderCanvas) ladderCtx = ladderCanvas.getContext('2d');
+            drawLadderStatic(3, false);
+        }
+
+        function drawLadderStatic(lineCount = 3, isStartLeft = true) {
+            if (!ladderCtx) return;
+            const w = ladderCanvas.width;
+            const h = ladderCanvas.height;
+            ladderCtx.clearRect(0, 0, w, h);
+
+            // 세로 기둥 (좌: x=50, 우: x=180)
+            ladderCtx.strokeStyle = '#6366f1';
+            ladderCtx.lineWidth = 6;
+            ladderCtx.lineCap = 'round';
+
+            // 왼쪽 기둥
+            ladderCtx.beginPath(); ladderCtx.moveTo(50, 25); ladderCtx.lineTo(50, 145); ladderCtx.stroke();
+            // 오른쪽 기둥
+            ladderCtx.beginPath(); ladderCtx.moveTo(180, 25); ladderCtx.lineTo(180, 145); ladderCtx.stroke();
+
+            // 상단/하단 라벨
+            ladderCtx.font = 'bold 12px Inter, sans-serif';
+            ladderCtx.fillStyle = '#60a5fa'; ladderCtx.fillText('좌', 44, 16);
+            ladderCtx.fillStyle = '#f87171'; ladderCtx.fillText('우', 174, 16);
+
+            ladderCtx.fillStyle = '#fbbf24';
+            ladderCtx.fillText('홀', 44, 165);
+            ladderCtx.fillText('짝', 174, 165);
+
+            // 가로줄 그리기 (3줄 또는 4줄)
+            ladderCtx.strokeStyle = '#a5b4fc';
+            ladderCtx.lineWidth = 4;
+            let yPositions = lineCount === 3 ? [55, 85, 115] : [45, 70, 95, 120];
+            
+            yPositions.forEach(y => {
+                ladderCtx.beginPath();
+                ladderCtx.moveTo(50, y);
+                ladderCtx.lineTo(180, y);
+                ladderCtx.stroke();
+            });
         }
 
         function selectLadderSpot(spot) {
             if (ladderPhase !== 'WAITING') return showToast("게임 진행 중에는 선택할 수 없습니다.");
             ladderSelectedSpot = spot;
 
-            ['LEFT_ODD', 'LEFT_EVEN', 'RIGHT_ODD', 'RIGHT_EVEN'].forEach(s => {
+            const allSpots = ['LEFT', 'RIGHT', 'ODD', 'EVEN', 'LEFT_4_ODD', 'LEFT_3_EVEN', 'RIGHT_3_ODD', 'RIGHT_4_EVEN'];
+            allSpots.forEach(s => {
                 const btn = document.getElementById(`btnLadder${s}`);
-                if (s === spot) btn.className = "bg-indigo-600 text-white font-extrabold py-2 rounded-lg text-xs border border-indigo-400 shadow";
-                else btn.className = "bg-slate-800 py-2 rounded-lg text-xs font-bold border border-slate-700 text-slate-300";
+                if (btn) {
+                    if (s === spot) btn.className = "bg-indigo-600 text-white font-extrabold py-1.5 rounded-lg text-xs border border-indigo-400 shadow";
+                    else btn.className = "bg-slate-800 py-1.5 rounded-lg text-xs font-bold border border-slate-700 text-slate-300";
+                }
             });
 
-            const labels = { LEFT_ODD: '좌/홀', LEFT_EVEN: '좌/짝', RIGHT_ODD: '우/홀', RIGHT_EVEN: '우/짝' };
+            const labels = {
+                LEFT: '좌 (1.95배)', RIGHT: '우 (1.95배)', ODD: '홀 (1.95배)', EVEN: '짝 (1.95배)',
+                LEFT_4_ODD: '좌4홀 (3.8배)', LEFT_3_EVEN: '좌3짝 (3.8배)', RIGHT_3_ODD: '우3홀 (3.8배)', RIGHT_4_EVEN: '우4짝 (3.8배)'
+            };
             document.getElementById('ladderSelectedSpotDisplay').innerText = labels[spot];
             playSound('chip');
         }
 
         function toggleLadderParticipation() {
             if (ladderPhase !== 'WAITING') return showToast("게임 진행 중에는 참여할 수 없습니다.");
-            if (!ladderSelectedSpot) return showToast("좌/홀, 좌/짝 등 배팅 구역을 먼저 선택해주세요.");
+            if (!ladderSelectedSpot) return showToast("원하시는 사다리 배팅 구역을 선택해주세요.");
 
             const amt = parseInt(document.getElementById('ladderBetAmountInput').value || 0, 10);
             if (amt <= 0) return showToast("배팅 금액을 입력해 주세요.");
@@ -892,17 +975,12 @@
 
             document.getElementById('ladderSelectedSpotDisplay').innerText = '미선택';
             document.getElementById('ladderResultText').innerText = "대기 중...";
-            document.getElementById('ladderBall').classList.add('hidden');
-            document.getElementById('ladderLine1').classList.add('hidden');
-            document.getElementById('ladderLine2').classList.add('hidden');
 
             const btn = document.getElementById('ladderJoinBtn');
             btn.innerText = "참여 예약하기";
             btn.className = "w-1/2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-lg text-xs shadow transition";
 
-            ['LEFT_ODD', 'LEFT_EVEN', 'RIGHT_ODD', 'RIGHT_EVEN'].forEach(s => {
-                document.getElementById(`btnLadder${s}`).className = "bg-slate-800 py-2 rounded-lg text-xs font-bold border border-slate-700 text-slate-300";
-            });
+            drawLadderStatic(3, true);
 
             let timerInterval = setInterval(() => {
                 document.getElementById('ladderTimerText').innerText = `⏳ 다음 게임 시작까지 ${ladderTimer}초 남았습니다 (참여 가능)`;
@@ -916,55 +994,100 @@
 
         async function runLadderGameRunning() {
             ladderPhase = 'RUNNING';
-            document.getElementById('ladderTimerText').innerText = "🚀 사다리 이동 중...";
-
-            const ball = document.getElementById('ladderBall');
-            ball.classList.remove('hidden');
+            document.getElementById('ladderTimerText').innerText = "🚀 사다리타기 진행 중...";
 
             const isStartLeft = Math.random() < 0.5;
             const lineCount = Math.random() < 0.5 ? 3 : 4;
+            let isEndLeft = lineCount === 3 ? !isStartLeft : isStartLeft;
+            const isOdd = isEndLeft; 
 
-            let isEndLeft = isStartLeft;
-            if (lineCount === 3) isEndLeft = !isStartLeft;
-            const isOdd = isEndLeft;
+            // 경로 계산 (네이버 사다리 타기)
+            let pathPoints = [];
+            let startX = isStartLeft ? 50 : 180;
+            let endX = isEndLeft ? 50 : 180;
+            let yPositions = lineCount === 3 ? [55, 85, 115] : [45, 70, 95, 120];
 
-            let finalKey = (isStartLeft ? 'LEFT' : 'RIGHT') + '_' + (isOdd ? 'ODD' : 'EVEN');
-            let finalLabel = (isStartLeft ? '좌' : '우') + '/' + (isOdd ? '홀' : '짝');
+            let curX = startX;
+            pathPoints.push({x: curX, y: 25});
 
-            ball.style.top = '4px';
-            ball.style.left = isStartLeft ? '6px' : '165px';
-            await sleep(400); playSound('tick');
+            yPositions.forEach(y => {
+                pathPoints.push({x: curX, y: y});
+                curX = curX === 50 ? 180 : 50;
+                pathPoints.push({x: curX, y: y});
+            });
+            pathPoints.push({x: curX, y: 145});
 
-            document.getElementById('ladderLine1').classList.remove('hidden');
-            ball.style.top = '30px';
-            await sleep(400); playSound('tick');
+            // 실시간 이동 애니메이션
+            for (let i = 0; i < pathPoints.length - 1; i++) {
+                let p1 = pathPoints[i];
+                let p2 = pathPoints[i+1];
+                let steps = 15;
+                for (let s = 0; s <= steps; s++) {
+                    let interpX = p1.x + (p2.x - p1.x) * (s / steps);
+                    let interpY = p1.y + (p2.y - p1.y) * (s / steps);
 
-            document.getElementById('ladderLine2').classList.remove('hidden');
-            ball.style.top = '75px';
-            ball.style.left = isEndLeft ? '6px' : '165px';
-            await sleep(400); playSound('tick');
+                    drawLadderStatic(lineCount, isStartLeft);
+                    
+                    // 지나온 궤적 트레이스
+                    ladderCtx.strokeStyle = '#ef4444';
+                    ladderCtx.lineWidth = 5;
+                    ladderCtx.beginPath();
+                    ladderCtx.moveTo(pathPoints[0].x, pathPoints[0].y);
+                    for(let k=0; k<i; k++) ladderCtx.lineTo(pathPoints[k+1].x, pathPoints[k+1].y);
+                    ladderCtx.lineTo(interpX, interpY);
+                    ladderCtx.stroke();
 
-            ball.style.top = '115px';
-            await sleep(400);
+                    // 노란색 이동 볼
+                    ladderCtx.fillStyle = '#f59e0b';
+                    ladderCtx.beginPath();
+                    ladderCtx.arc(interpX, interpY, 7, 0, Math.PI * 2);
+                    ladderCtx.fill();
+                    ladderCtx.strokeStyle = '#ffffff';
+                    ladderCtx.lineWidth = 2;
+                    ladderCtx.stroke();
 
-            document.getElementById('ladderResultText').innerText = `🎉 ${finalLabel}`;
-            
+                    await sleep(18);
+                }
+                playSound('tick');
+            }
+
+            // 결과 구하기
+            let startStr = isStartLeft ? '좌' : '우';
+            let lineStr = `${lineCount}줄`;
+            let oddStr = isOdd ? '홀' : '짝';
+            let finalResultLabel = `${startStr}${lineCount}${oddStr}`; // 예: 좌4짝, 우3홀
+
+            document.getElementById('ladderResultText').innerText = `🎉 ${finalResultLabel}`;
+
+            // 배팅 정산
             if (ladderIsParticipating && ladderSelectedSpot) {
                 const amt = parseInt(document.getElementById('ladderBetAmountInput').value || 0, 10);
-                if (ladderSelectedSpot === finalKey) {
-                    let winAmt = Math.floor(amt * 1.95);
+                let isWin = false;
+                let multiplier = 1.95;
+
+                if (ladderSelectedSpot === 'LEFT' && isStartLeft) isWin = true;
+                else if (ladderSelectedSpot === 'RIGHT' && !isStartLeft) isWin = true;
+                else if (ladderSelectedSpot === 'ODD' && isOdd) isWin = true;
+                else if (ladderSelectedSpot === 'EVEN' && !isOdd) isWin = true;
+                else if (ladderSelectedSpot === 'LEFT_4_ODD' && isStartLeft && lineCount === 4 && isOdd) { isWin = true; multiplier = 3.80; }
+                else if (ladderSelectedSpot === 'LEFT_3_EVEN' && isStartLeft && lineCount === 3 && !isOdd) { isWin = true; multiplier = 3.80; }
+                else if (ladderSelectedSpot === 'RIGHT_3_ODD' && !isStartLeft && lineCount === 3 && isOdd) { isWin = true; multiplier = 3.80; }
+                else if (ladderSelectedSpot === 'RIGHT_4_EVEN' && !isStartLeft && lineCount === 4 && !isOdd) { isWin = true; multiplier = 3.80; }
+
+                if (isWin) {
+                    let winAmt = Math.floor(amt * multiplier);
                     balance += winAmt;
                     updateBalanceDisplay();
                     streaks.ladder++;
                     playSound('win');
-                    showToast("🎉 사다리 적중!", `+${winAmt.toLocaleString()} ₩ 획득 완료! (연승: ${streaks.ladder}회)`);
+                    showToast("🎉 사다리 적중!", `+${winAmt.toLocaleString()} ₩ 획득 완료! (배율: ${multiplier}배, 연승: ${streaks.ladder}회)`);
                 } else {
                     streaks.ladder = 0;
                     showToast("💥 아쉬움", "사다리 예측 실패!");
                 }
             }
 
-            ladderHistory.push(finalLabel);
+            ladderHistory.push(finalResultLabel);
             document.getElementById('ladderHistoryList').innerText = ladderHistory.slice(-5).join(', ');
 
             setTimeout(() => {
@@ -972,6 +1095,7 @@
             }, 3000);
         }
 
+        // ==================== 환전 시스템 로직 ====================
         function addExchangeAmount(amt) {
             const input = document.getElementById('exchangeAmountInput');
             let current = parseInt(input.value || 0, 10);
@@ -1017,6 +1141,7 @@
             });
         }
 
+        // ==================== 그래프 게임 루프 ====================
         function setCrashBet(amount) {
             if (crashGamePhase === 'RUNNING') return showToast("게임 상승 중에는 배팅금을 바꿀 수 없습니다.");
             if (balance < amount) return showToast("잔액이 부족합니다.");
@@ -1168,6 +1293,7 @@
             }, 3000);
         }
 
+        // ==================== 바카라 엔진 로직 (PLAYER 2배, BANKER 1.95배 정산) ====================
         function createDeck() {
             const suits = ['♠', '♥', '♦', '♣'];
             const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
