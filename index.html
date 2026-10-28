@@ -316,7 +316,7 @@
 
     </main>
 
-    <!-- Mobile Bottom Navigation Bar -->
+    <!-- Mobile Bottom Navigation Bar (하단 고정 메뉴) -->
     <nav class="fixed bottom-0 left-0 right-0 bg-slate-950 border-t border-slate-800 flex justify-around items-center py-2 z-40 sm:hidden">
         <button onclick="openHistoryModal()" class="flex flex-col items-center text-slate-400 hover:text-amber-400 text-[10px]">
             <i data-lucide="history" class="w-5 h-5 mb-0.5"></i>
@@ -325,6 +325,11 @@
         <button onclick="openRechargeModal()" class="flex flex-col items-center text-slate-500 text-[10px]">
             <i data-lucide="wallet" class="w-5 h-5 mb-0.5"></i>
             <span>칩충전(차단)</span>
+        </button>
+        <!-- 하단 환전 버튼 추가 -->
+        <button onclick="switchGameMode('exchange')" class="flex flex-col items-center text-slate-400 hover:text-amber-400 text-[10px]">
+            <i data-lucide="arrow-right-left" class="w-5 h-5 mb-0.5 text-amber-400"></i>
+            <span class="text-amber-400 font-bold">환전신청</span>
         </button>
         <button onclick="resetRoadmap()" class="flex flex-col items-center text-slate-400 hover:text-amber-400 text-[10px]">
             <i data-lucide="rotate-ccw" class="w-5 h-5 mb-0.5"></i>
