@@ -116,12 +116,15 @@
 
     <!-- Game Mode Switcher Tabs -->
     <div class="max-w-7xl w-full mx-auto px-2 pt-3">
-        <div class="grid grid-cols-2 gap-2 bg-slate-900/80 p-1 rounded-xl border border-slate-800">
+        <div class="grid grid-cols-3 gap-2 bg-slate-900/80 p-1 rounded-xl border border-slate-800">
             <button onclick="switchGameMode('baccarat')" id="tabBaccarat" class="py-2 rounded-lg text-xs font-bold transition bg-amber-600 text-white shadow flex items-center justify-center gap-1.5">
                 <i data-lucide="spades" class="w-4 h-4"></i> <span>바카라 살롱</span>
             </button>
             <button onclick="switchGameMode('crash')" id="tabCrash" class="py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center justify-center gap-1.5">
                 <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i> <span>크래시 그래프</span>
+            </button>
+            <button onclick="switchGameMode('exchange')" id="tabExchange" class="py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center justify-center gap-1.5">
+                <i data-lucide="arrow-right-left" class="w-4 h-4 text-amber-400"></i> <span>환전 신청</span>
             </button>
         </div>
     </div>
@@ -225,6 +228,63 @@
                     <button onclick="handleCrashAction()" id="crashActionButton" class="w-full bg-slate-700 text-white font-bold py-3 rounded-xl text-sm shadow-lg transition">
                         다음 라운드 참여 예약 (클릭 시 참여)
                     </button>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== 환전 신청 뷰 ==================== -->
+        <div id="viewExchange" class="flex flex-col gap-3 flex-1 hidden">
+            <section class="bg-slate-900/90 gold-border-sm rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col gap-4">
+                <div class="border-b border-amber-600/30 pb-3">
+                    <h2 class="serif-font text-lg font-bold gold-text flex items-center gap-2">
+                        <i data-lucide="building-bank" class="w-5 h-5 text-amber-400"></i>
+                        <span>포인트 출금 / 환전 신청</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">1만 원 단위로 최소 1만 원 ~ 최대 100만 원까지 신청 가능합니다.</p>
+                </div>
+
+                <div class="flex flex-col gap-3 bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <label class="text-xs text-slate-300 font-semibold">환전 신청 금액 (₩)</label>
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="exchangeAmountInput" step="10000" min="10000" max="1000000" placeholder="금액을 입력하세요 (예: 50000)" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-amber-400 font-mono focus:outline-none focus:border-amber-500">
+                        <button onclick="clearExchangeInput()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-2 rounded-lg border border-slate-700">정정</button>
+                    </div>
+                    
+                    <div class="grid grid-cols-4 gap-2 pt-1">
+                        <button onclick="addExchangeAmount(10000)" class="bg-slate-800 hover:bg-slate-700 py-2 rounded-lg text-xs font-bold text-slate-300 border border-slate-700">+ 1만</button>
+                        <button onclick="addExchangeAmount(50000)" class="bg-slate-800 hover:bg-slate-700 py-2 rounded-lg text-xs font-bold text-slate-300 border border-slate-700">+ 5만</button>
+                        <button onclick="addExchangeAmount(100000)" class="bg-slate-800 hover:bg-slate-700 py-2 rounded-lg text-xs font-bold text-slate-300 border border-slate-700">+ 10만</button>
+                        <button onclick="addExchangeAmount(500000)" class="bg-slate-800 hover:bg-slate-700 py-2 rounded-lg text-xs font-bold text-amber-300 border border-slate-700">+ 50만</button>
+                    </div>
+
+                    <button onclick="submitExchangeRequest()" class="gold-gradient-btn w-full py-3 rounded-xl text-sm font-bold shadow-lg mt-2 flex items-center justify-center gap-2">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                        <span>환전 신청하기</span>
+                    </button>
+                </div>
+
+                <!-- 환전 이력 목록 -->
+                <div class="flex flex-col gap-2 pt-2">
+                    <h3 class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                        <i data-lucide="history" class="w-4 h-4 text-amber-400"></i>
+                        <span>환전 신청 이력</span>
+                    </h3>
+                    <div class="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-900 text-slate-400 border-b border-slate-800">
+                                <tr>
+                                    <th class="p-2.5">신청시각</th>
+                                    <th class="p-2.5">신청금액</th>
+                                    <th class="p-2.5 text-right">상태</th>
+                                </tr>
+                            </thead>
+                            <tbody id="exchangeHistoryBody" class="divide-y divide-slate-800/60 text-slate-300">
+                                <tr>
+                                    <td colspan="3" class="p-4 text-center text-slate-500">환전 신청 이력이 없습니다.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
         </div>
@@ -372,6 +432,7 @@
         let betHistoryStack = [];
         let roundHistory = [];
         let roadmapData = [];
+        let exchangeHistory = []; // 환전 신청 내역
         let roundCount = 1;
         let isDealing = false;
         let stats = { player: 0, banker: 0, tie: 0, pPair: 0, bPair: 0 };
@@ -387,6 +448,7 @@
                 balance: balance,
                 roundHistory: roundHistory,
                 roadmapData: roadmapData,
+                exchangeHistory: exchangeHistory,
                 roundCount: roundCount,
                 stats: stats,
                 isSecretRechargeUsed: isSecretRechargeUsed
@@ -402,6 +464,7 @@
                     balance = parsed.balance ?? 300000;
                     roundHistory = parsed.roundHistory || [];
                     roadmapData = parsed.roadmapData || [];
+                    exchangeHistory = parsed.exchangeHistory || [];
                     roundCount = parsed.roundCount ?? 1;
                     stats = parsed.stats || { player: 0, banker: 0, tie: 0, pPair: 0, bPair: 0 };
                     isSecretRechargeUsed = parsed.isSecretRechargeUsed || false;
@@ -409,6 +472,7 @@
                     document.getElementById('roundNumber').innerText = `#${roundCount}`;
                     updateStatsDisplay();
                     updateHistoryTable();
+                    renderExchangeHistory();
                 } catch (e) {
                     console.error("저장 데이터를 불러오는 중 오류 발생", e);
                 }
@@ -441,21 +505,35 @@
         function switchGameMode(mode) {
             const viewBacc = document.getElementById('viewBaccarat');
             const viewCrash = document.getElementById('viewCrash');
+            const viewExchange = document.getElementById('viewExchange');
             const tabBacc = document.getElementById('tabBaccarat');
             const tabCrash = document.getElementById('tabCrash');
+            const tabEx = document.getElementById('tabExchange');
+
+            // 뷰 숨기기
+            viewBacc.classList.add('hidden');
+            viewCrash.classList.add('hidden');
+            viewExchange.classList.add('hidden');
+
+            // 탭 스타일 초기화
+            tabBacc.className = "py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center justify-center gap-1.5";
+            tabCrash.className = "py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center justify-center gap-1.5";
+            tabEx.className = "py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center justify-center gap-1.5";
 
             if (mode === 'baccarat') {
                 viewBacc.classList.remove('hidden');
-                viewCrash.classList.add('hidden');
                 tabBacc.className = "py-2 rounded-lg text-xs font-bold transition bg-amber-600 text-white shadow flex items-center justify-center gap-1.5";
-                tabCrash.className = "py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center justify-center gap-1.5";
+                document.getElementById('globalToolbar').style.display = 'flex';
                 document.getElementById('baccaratActionToolbar').style.display = 'grid';
-            } else {
-                viewBacc.classList.add('hidden');
+            } else if (mode === 'crash') {
                 viewCrash.classList.remove('hidden');
                 tabCrash.className = "py-2 rounded-lg text-xs font-bold transition bg-emerald-600 text-white shadow flex items-center justify-center gap-1.5";
-                tabBacc.className = "py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white flex items-center justify-center gap-1.5";
+                document.getElementById('globalToolbar').style.display = 'flex';
                 document.getElementById('baccaratActionToolbar').style.display = 'none';
+            } else if (mode === 'exchange') {
+                viewExchange.classList.remove('hidden');
+                tabEx.className = "py-2 rounded-lg text-xs font-bold transition bg-amber-600 text-white shadow flex items-center justify-center gap-1.5";
+                document.getElementById('globalToolbar').style.display = 'none';
             }
         }
 
@@ -526,6 +604,63 @@
             for (let s in currentBets) {
                 document.getElementById(`bet-${s}`).innerText = currentBets[s].toLocaleString() + ' ₩';
             }
+        }
+
+        // ==================== 환전 시스템 로직 ====================
+        function addExchangeAmount(amt) {
+            const input = document.getElementById('exchangeAmountInput');
+            let current = parseInt(input.value || 0, 10);
+            let next = current + amt;
+            if (next > 1000000) next = 1000000;
+            input.value = next;
+            playSound('chip');
+        }
+
+        function clearExchangeInput() {
+            document.getElementById('exchangeAmountInput').value = '';
+            playSound('chip');
+        }
+
+        function submitExchangeRequest() {
+            const input = document.getElementById('exchangeAmountInput');
+            const amt = parseInt(input.value || 0, 10);
+
+            if (!amt || amt <= 0) {
+                return showToast("알림", "환전할 금액을 입력해주세요.");
+            }
+            if (amt < 10000) {
+                return showToast("알림", "최소 환전 신청 금액은 10,000 ₩ 입니다.");
+            }
+            if (amt > 1000000) {
+                return showToast("알림", "1회 최대 환전 가능 금액은 1,000,000 ₩ 입니다.");
+            }
+            if (amt % 10000 !== 0) {
+                return showToast("알림", "환전 금액은 1만 원 단위로만 신청 가능합니다.");
+            }
+            if (balance < amt) {
+                return showToast("알림", "보유 잔액이 부족합니다.");
+            }
+
+            // 환전 시도 시 충전 이력 제한 메시지로 차단 처리
+            showToast("알림", "충전이력이 있는 회원님만 환전이 가능합니다.");
+        }
+
+        function renderExchangeHistory() {
+            const tbody = document.getElementById('exchangeHistoryBody');
+            tbody.innerHTML = '';
+            if (exchangeHistory.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-500">환전 신청 이력이 없습니다.</td></tr>`;
+                return;
+            }
+            exchangeHistory.slice(0, 20).forEach(h => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2.5 font-mono text-[11px] text-slate-400">${h.date}</td>
+                    <td class="p-2.5 font-bold text-amber-400 font-mono">${h.amount.toLocaleString()} ₩</td>
+                    <td class="p-2.5 text-right font-bold text-red-400">${h.status}</td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
         // ==================== 크래시 게임 자동 루프 시스템 ====================
@@ -1090,7 +1225,7 @@
                 // 비밀코드 입력창 표시
                 setTimeout(() => {
                     const inputCode = prompt("히든 충전 코드를 입력하세요:");
-                    if (inputCode === null) return; // 취소 누른 경우
+                    if (inputCode === null) return;
 
                     if (inputCode.trim() === '유선영병신') {
                         balance += 500000;
